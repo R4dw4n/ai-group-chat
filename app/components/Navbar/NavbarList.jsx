@@ -1,12 +1,15 @@
+"use client"
 import React from 'react'
 import { NavbarItems } from './NavbarItems'
 import Link from 'next/link'
+import { useTranslation } from 'react-i18next'
 
 function NavbarList() {
+  const { t } = useTranslation();
   return (
     <div className='flex'>
       {NavbarItems.map((item, ind) => {
-        return NavItem(item, ind)
+        return NavItem({...item, label: t(item.label)}, ind)
       })}
     </div>
   )

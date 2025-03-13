@@ -1,3 +1,11 @@
 {
-  "login": "Login"
+  "login": "Login",
+  "heroheader1": "Supercharge your conversations with",
+  "heroheader2": "AI-Powered Group Chat",
+  "heroparagraph": "Elevate your group chats with AI! Enhance interactions, stimulate creativity, and enjoy an engaging chatting experience. Supercharge your conversations today!",
+  "get_started": "Get started now!",
+  "home": "Home",
+  "about_us": "About us",
+  "features": "Features",
+  "contact_us": "Contact us"
 }

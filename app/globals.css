@@ -10,6 +10,7 @@
   --dark-gray: #151523;
   --gray: #545454;
   --navigation-gray: #B5B5BA;
+  --cards: #17171A;
 }
 
 @theme {
@@ -21,6 +22,7 @@
   --color-gray: var(--gray);
   --color-navigation-gray: var(--navigation-gray);
   --color-white: var(--white);
+  --color-cards: var(--cards);
 }
 
 @layer utilities {

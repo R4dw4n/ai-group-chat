@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 function Hero() {
   const { t } = useTranslation();
   return (
-    <div className="w-5xl h-[635px] py-32 m-auto text-center">
+    <div className="w-5xl h-[calc(100vh-80px)] py-32 m-auto text-center" id="Home">
       <h1 className="text-[52px] text-white whitespace-nowrap">
         {t("heroheader1")}
       </h1>

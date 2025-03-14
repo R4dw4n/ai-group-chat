@@ -7,5 +7,13 @@
   "home": "Home",
   "about_us": "About us",
   "features": "Features",
-  "contact_us": "Contact us"
+  "contact_us": "Contact us",
+  "title_feature1": "Natural Language Understanding",
+  "title_feature2": "Contextual Memory",
+  "title_feature3": "Privacy Protection",
+  "title_feature4": "Fun and Engaging Features",
+  "description_feature1": "Highlight how the AI can understand and respond to complex queries, slang, or casual language, making interactions feel more human-like and intuitive for users.",
+  "description_feature2": "Discuss how the AI remembers the context of ongoing conversations, allowing it to provide relevant follow-up responses and maintain continuity in discussions.",
+  "description_feature3": "The AI ensures complete privacy by not storing or sharing any personal data from group chats. All conversations are processed in real-time, and no chat history is saved, giving users peace of mind that their information remains confidential.",
+  "description_feature4": "Showcase the AI’s ability to entertain users with jokes, trivia, games, or creative responses, adding a fun and engaging element to group chats."
 }

@@ -3,6 +3,7 @@ import useTypewriter from "@/app/hooks/useTypewriter";
 import { useInView, motion } from "motion/react";
 import React, { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import PrimaryButton from "../PrimaryButton";
 
 function Hero() {
   const { t } = useTranslation();
@@ -63,16 +64,9 @@ function Hero() {
         ></span>
       </p>
 
-      <button className="group relative text-light-gray w-xl h-14 rounded-[20px] cursor-pointer overflow-hidden">
-        {/* <!-- Background Gradient --> */}
-        <div className="w-full absolute inset-0 bg-gradient-to-r from-primary-blue to-secondary-purple transition-opacity duration-500 group-hover:opacity-0"></div>
-
-        {/* <!-- Hover Gradient --> */}
-        <div className="w-full absolute inset-0 bg-gradient-to-l from-primary-blue to-secondary-purple opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div>
-
-        {/* <!-- Button Text --> */}
-        <span className="relative z-10">{t("get_started")}</span>
-      </button>
+      <PrimaryButton width="w-xl" height="h-14">
+        {t("get_started")}
+      </PrimaryButton>
     </div>
   );
 }

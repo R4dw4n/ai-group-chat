@@ -1,5 +1,5 @@
 "use client";
-import { images } from "@/app/utilities/assets";
+import { icons } from "@/app/utilities/assets";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -32,7 +32,7 @@ function LanguageSwitcher() {
         className="cursor-pointer"
         onClick={() => setIsOpen((prev) => !prev)}
       >
-        <Image src={images.LANGUAGE} alt="language" width={25} height={25} />
+        <Image src={icons.LANGUAGE} alt="language" width={25} height={25} />
       </button>
       <div
         dir="rtl"

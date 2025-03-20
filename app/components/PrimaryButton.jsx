@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import { useTranslation } from "react-i18next";
 
 function PrimaryButton({
   width="",
@@ -9,8 +8,8 @@ function PrimaryButton({
   toColor="",
   hoverFromColor="",
   hoverToColor="",
+  children,
 }) {
-  const { t } = useTranslation();
   return (
     <button
       className={`group relative text-light-gray w-48 h-14 rounded-[20px] cursor-pointer overflow-hidden ${width} ${height}`}
@@ -26,7 +25,7 @@ function PrimaryButton({
       ></div>
 
       {/* <!-- Button Text --> */}
-      <span className="relative z-10">{t("login")}</span>
+      <span className="relative z-10">{children}</span>
     </button>
   );
 }

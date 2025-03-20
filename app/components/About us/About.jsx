@@ -2,13 +2,12 @@
 import React, { useRef } from "react";
 import { motion, useInView } from "motion/react";
 import { useTranslation } from "react-i18next";
-import { featuresItems } from "./FeaturesItems";
 import Card from "../Cards/Card";
+import { aboutItems } from "./AboutItems";
 
 const variants = {
   initial: {
     opacity: 0,
-    x: "-200vw",
     transition: {
       duration: 0.1,
       delay: 0,
@@ -16,16 +15,26 @@ const variants = {
   },
   animate: {
     opacity: 1,
-    x: 0,
     transition: {
-      opacity: {
-        delay: 0.5,
-        duration: 2,
-      },
-      x: {
-        delay: 0,
-        duration: 1,
-      },
+      delay: 0.2,
+      duration: 4,
+      staggerChildren: 0.3,
+    },
+  },
+};
+
+const itemVariants = {
+  initial: {
+    opacity: 0,
+    transition: {
+      duration: 0.1,
+      delay: 0,
+    },
+  },
+  animate: {
+    opacity: 1,
+    transition: {
+      duration: 2,
     },
   },
 };
@@ -40,33 +49,34 @@ const h1Variants = {
   },
 };
 
-function Features() {
+function About() {
   const { t } = useTranslation();
   const ref = useRef();
   const isInView = useInView(ref);
   return (
-    <div id="Features" className="w-5xl m-auto mt-2" ref={ref}>
+    <div id="About" className="w-5xl m-auto my-32" ref={ref}>
       <motion.h1
         variants={h1Variants}
         initial="initial"
         animate={isInView ? "animate" : "initial"}
         className="text-[52px] text-primary-blue text-center"
       >
-        {t("features")}
+        {t("about_us")}
       </motion.h1>
 
       <motion.div
         variants={variants}
         initial="initial"
         animate={isInView ? "animate" : "initial"}
-        className="p-1 grid grid-cols-2 grid-rows-2 w-full gap-4"
+        className="p-1 grid grid-cols-3 grid-rows-2 w-full gap-4"
       >
-        {featuresItems.map((item, ind) => (
+        {aboutItems.map((item, ind) => (
           <Card
-            item={item}
             key={ind}
-            titleStyle="text-2xl text-light-gray"
-            descriptionStyle="text-sm text-center text-light-gray/50 w-full"
+            motionVariants={itemVariants}
+            item={item}
+            titleStyle="text-3xl text-light-gray"
+            descriptionStyle="text-center text-light-gray/50 w-full"
           />
         ))}
       </motion.div>
@@ -74,4 +84,4 @@ function Features() {
   );
 }
 
-export default Features;
+export default About;

@@ -13,7 +13,7 @@ const paddingStyle = {
 }
 
 function HomeNavbar() {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   return (
     <>
       <div className="flex items-center">
@@ -22,7 +22,9 @@ function HomeNavbar() {
       </div>
       <div className={`flex items-center justify-center ${paddingStyle[i18n.language]} pt-4 gap-4`}>
         <LanguageSwitcher />
-        <PrimaryButton />
+        <PrimaryButton>
+          {t("login")}
+        </PrimaryButton>
       </div>
     </>
   );

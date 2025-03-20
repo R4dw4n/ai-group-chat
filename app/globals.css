@@ -30,19 +30,28 @@
     font-family: "Cairo", sans-serif;
   }
 }
-
+html {
+  scroll-behavior: smooth;
+}
 body {
   background: var(--background);
   box-sizing: border-box;
 }
 
-.bubble::before {
-  content: "";
-  position: absolute;
-  top: -20px;
-  left: 10px;
-  width: 0;
-  border-bottom: 20px solid red;
-  border-left: 20px solid transparent;
-  border-right: 20px solid transparent;
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }

@@ -13,7 +13,7 @@ export default async function RootLayout({ children }) {
   console.log("locale: ", locale)
   return (
     <html lang="en" className="font-cairo" dir={locale === "ar" ? "rtl": "ltr"}>
-      <body>
+      <body style={{ overflowX: "hidden" }}>
         <TranslationProvider>
           {children}
         </TranslationProvider>

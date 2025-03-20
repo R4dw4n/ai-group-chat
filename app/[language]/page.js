@@ -7,7 +7,6 @@ import Contact from "../components/Contact us/Contact";
 import Footer from "../components/Footer/Footer";
 
 export default function Home() {
-
   return (
     <>
       {/* Navbar */}
@@ -15,19 +14,11 @@ export default function Home() {
         <HomeNavbar />
       </Navbar>
 
-      {/* MAIN HERO SECTION */}
       <Hero />
-
-      {/* FEATURES */}
       <Features />
-
-      {/* ABOUT US */}
       <About />
-
-      {/* CONTACT US */}
       <Contact />
 
-      {/* FOOTER */}
       <Footer />
     </>
   );

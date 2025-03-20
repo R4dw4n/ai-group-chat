@@ -6,7 +6,7 @@ function Page() {
   return (
     <div className='flex h-screen w-screen'>
       <Sidebar />
-      <h1 className='text-center m-auto text-6xl text-white py-24'>Start Chatting!</h1>
+      <Chat />
     </div>
   )
 }

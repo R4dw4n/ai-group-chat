@@ -29,8 +29,10 @@
   "title_about6": "Join Our Community",
   "description_about6": "We’re constantly evolving and would love for you to join our growing community. Share your feedback, suggest features, and help us shape the future of AI-powered group chats.",
   "email": "E-mail",
-  "phone_number": "Phone number",
   "address": "Address",
+  "email_address": "E-mail Address",
+  "password": "Password",
+  "phone_number": "Phone number",
   "homs_syria": "Homs, Syria",
   "work_together": "Let's work together!",
   "name": "Name",
@@ -40,5 +42,14 @@
   "privacypolicy": "Privacy Policy",
   "copyright": "Copyright © 2025 All Rights Reserved To Our Team",
   "search": "Search",
-  "type_message": "Type a message..."
+  "type_message": "Type a message...",
+  "failed_response": "An error occured. Please try again",
+  "success": "Operation Is Successful!",
+  "loginGreeting": "WELCOME BACK",
+  "loginTitle": "Login to your account",
+  "remember_me": "Remember Me",
+  "forgot_password": "Forgot Password?",
+  "new_user?": "New User?",
+  "signup": "SIGNUP",
+  "or": "Or"
 }

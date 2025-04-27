@@ -8,10 +8,12 @@ function PrimaryButton({
   toColor="",
   hoverFromColor="",
   hoverToColor="",
+  onClick=() => {},
   children,
 }) {
   return (
     <button
+      onClick={onClick}
       className={`group relative text-light-gray w-48 h-14 rounded-[20px] cursor-pointer overflow-hidden ${width} ${height}`}
     >
       {/* <!-- Background Gradient --> */}

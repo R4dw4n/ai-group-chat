@@ -1,6 +1,8 @@
+import '@ant-design/v5-patch-for-react-19';
 import TranslationProvider from "../translations/i18nProvider";
 import "../globals.css";
 import { cookies } from "next/headers";
+import AntDesignProvider from "../utilities/AntDesignProvider";
 
 export const metadata = {
   title: "AI Groupchat",
@@ -15,7 +17,9 @@ export default async function RootLayout({ children }) {
     <html lang="en" className="font-cairo" dir={locale === "ar" ? "rtl": "ltr"}>
       <body style={{ overflowX: "hidden" }}>
         <TranslationProvider>
-          {children}
+          <AntDesignProvider>
+            {children}
+          </AntDesignProvider>
         </TranslationProvider>
       </body>
     </html>

@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
 @import "tailwindcss";
 @tailwind utilities;
 
@@ -11,6 +12,8 @@
   --gray: #545454;
   --navigation-gray: #B5B5BA;
   --cards: #17171A;
+  --error: #ff6e6e;
+  --greeting-gray: #B2B2B2;
 }
 
 @theme {
@@ -23,11 +26,19 @@
   --color-navigation-gray: var(--navigation-gray);
   --color-white: var(--white);
   --color-cards: var(--cards);
+  --color-error: var(--error);
+  --color-greeting-gray: var(--greeting-gray);
 }
 
 @layer utilities {
   .font-cairo {
     font-family: "Cairo", sans-serif;
+  }
+  .font-lato {
+    font-family: "Lato", sans-serif;
+  }
+  .font-inter {
+    font-family: "Inter", sans-serif;
   }
 }
 html {
@@ -54,4 +65,8 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+:where(.css-dev-only-do-not-override-1v5z42l).ant-message .ant-message-notice-wrapper .ant-message-notice-content {
+  background-color: var(--dark-gray);
+  color: var(--white);
 }

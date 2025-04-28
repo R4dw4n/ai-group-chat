@@ -28,7 +28,7 @@ const ResizableDiv = ({ initialWidth, className, children }) => {
   return (
     <div
       className={`relative border border-gray ${className}`}
-      style={{ width: `${width}px` }}
+      style={{ width: `${width}px`, minWidth: "91px" }}
     >
       {/* Resize Handle */}
       <div

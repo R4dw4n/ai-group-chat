@@ -1,5 +1,5 @@
 {
-  "login": "Login",
+  "login": "LOGIN",
   "heroheader1": "Supercharge your conversations with",
   "heroheader2": "AI-Powered Group Chat",
   "heroparagraph": "Elevate your group chats with AI! Enhance interactions, stimulate creativity, and enjoy an engaging chatting experience. Supercharge your conversations today!",
@@ -51,5 +51,12 @@
   "forgot_password": "Forgot Password?",
   "new_user?": "New User?",
   "signup": "SIGNUP",
-  "or": "Or"
+  "or": "Or",
+  "fullName": "Full Name",
+  "username": "Username",
+  "confirm_password": "Confirm Password",
+  "accept_terms": "I accept the terms of service and privacy policy.",
+  "registerGreeting": "LET'S GET STARTED",
+  "registerTitle": "Create an account",
+  "have_account?": "Already have an account?"
 }

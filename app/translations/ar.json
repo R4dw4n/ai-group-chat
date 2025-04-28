@@ -51,5 +51,12 @@
   "forgot_password": "نسيت كلمة السر؟",
   "new_user?": "مستخدم جديد؟",
   "signup": "أنشئ حساب",
-  "or": "أو"
+  "or": "أو",
+  "fullName": "الاسم الكامل",
+  "username": "اسم المستخدم",
+  "confirm_password": "تأكيد كلمة السر",
+  "accept_terms": "أوافق على شروط الخدمة وسياسة الخصوصية",
+  "registerGreeting": "فلنبدأ معاً",
+  "registerTitle": "انشئ حساب جديد",
+  "have_account?": "لديك حساب مسبقاً؟"
 }

@@ -3,10 +3,12 @@ import { setTokens } from "@/app/api/axiosInstance";
 import { authService } from "@/app/api/services/authService";
 import PrimaryButton from "@/app/components/PrimaryButton";
 import { icons } from "@/app/utilities/assets";
+import Loading from "@/app/utilities/Loading";
 import { message } from "antd";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 const eyePosition = {
@@ -21,6 +23,7 @@ const fieldIconPosition = {
 
 function Page() {
   const [t, i18n] = useTranslation();
+  const router = useRouter();
   const [model, setModel] = useState({
     email: "",
     password: "",
@@ -52,6 +55,18 @@ function Page() {
   };
   const handleSubmit = (e) => {
     if (e.preventDefault) e.preventDefault();
+    if (!model.email || !model.password) {
+      setFieldErrors(prev => {
+        const ret = {...prev};
+        if (!model.email)
+          ret.email = "Email is required.";
+        if (!model.password)
+          ret.password = "Password is required.";
+
+        return { ...ret };
+      })
+      return;
+    }
     login();
   };
   const login = async () => {
@@ -60,11 +75,12 @@ function Page() {
       const res = await authService.login(model);
       message.success(t("success"), 2);
       setTokens(res.data.accessToken, res.data.refreshToken);
+      router.push("/chats");
     } catch (error) {
       console.log(error);
       if (error.response) {
-        message.error(error.response.message, 2);
-        error.response.errors.forEach((item) => {
+        message.error(error.response.data.message, 2);
+        error.response.data.errors.forEach((item) => {
           fieldErrors[item.field] = item.message;
         });
         setFieldErrors({ ...fieldErrors });
@@ -73,7 +89,11 @@ function Page() {
       setLoading(false);
     }
   };
+  useEffect(() => {
+    console.log(loading);
+  }, [loading])
   return (
+    <>
     <div className="min-h-[calc(100vh-80px)] min-w-screen pb-20 px-44 bg-background overflow-x-hidden">
       <form
         onSubmit={handleSubmit}
@@ -101,7 +121,7 @@ function Page() {
               fieldErrors.email ? "border-b-3 border-error" : ""
             }`}
             name="email"
-            type="text"
+            type="email"
             onChange={(e) => fieldValueChanged(e.target.value, "email")}
           />
           <p className="text-error font-semibold">{fieldErrors.email}</p>
@@ -191,6 +211,8 @@ function Page() {
         </div>
       </form>
     </div>
+    <Loading isLoading={loading} fullscreen />
+    </>
   );
 }
 

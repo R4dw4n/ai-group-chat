@@ -6,6 +6,7 @@ import LanguageSwitcher from "../LanguageSwitcher/LanguageSwitcher";
 import { images } from "@/app/utilities/assets";
 import { useTranslation } from "react-i18next";
 import PrimaryButton from "../PrimaryButton";
+import Link from "next/link";
 
 const paddingStyle = {
   ar: "pl-4",
@@ -22,9 +23,11 @@ function HomeNavbar() {
       </div>
       <div className={`flex items-center justify-center ${paddingStyle[i18n.language]} pt-4 gap-4`}>
         <LanguageSwitcher />
-        <PrimaryButton>
-          {t("login")}
-        </PrimaryButton>
+        <Link href="/login">
+          <PrimaryButton>
+            {t("login")}
+          </PrimaryButton>
+        </Link>
       </div>
     </>
   );

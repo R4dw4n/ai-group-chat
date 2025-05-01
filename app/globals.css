@@ -70,3 +70,7 @@ body {
   background-color: var(--dark-gray);
   color: var(--white);
 }
+:where(.css-1v5z42l).ant-message .ant-message-notice-wrapper .ant-message-notice-content {
+  background-color: var(--dark-gray);
+  color: var(--white);
+}

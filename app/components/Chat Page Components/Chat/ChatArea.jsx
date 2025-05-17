@@ -6,6 +6,7 @@ import { icons } from "@/app/utilities/assets";
 import Message from "./Message";
 
 function ChatArea() {
+  const ref = useRef(null);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [textareaHeight, setTextareaHeight] = useState(40); // Track textarea height
@@ -30,6 +31,7 @@ function ChatArea() {
       </div>
       <div className="flex gap-4 px-4 py-2 bg-dark-gray rounded-4xl mt-2">
         <ChatInput
+          inputRef={ref}
           setText={setMessage}
           text={message}
           textareaHeight={textareaHeight}
@@ -53,7 +55,8 @@ function ChatArea() {
               },
             ]);
             setMessage("");
-            setTextareaHeight(0); // Reset textarea height after sending
+            ref.current.style.height = 'auto'
+            setTextareaHeight(40); // Reset textarea height after sending
           }}
         />
       </div>

@@ -2,12 +2,11 @@
 import React, { useRef } from "react";
 import { useTranslation } from "react-i18next";
 
-function ChatInput({ text, setText, textareaHeight, setTextareaHeight, maxHeight }) {
-  const ref = useRef(null);
+function ChatInput({ text, setText, textareaHeight, setTextareaHeight, maxHeight, inputRef }) {
   const { t } = useTranslation();
   const handleInput = (event) => {
     setText(event.target.value);
-    const textarea = ref.current;
+    const textarea = inputRef.current;
     textarea.style.height = 'auto'; // Reset height to auto
     textarea.style.height = `${textarea.scrollHeight}px`; // Set height to scrollHeight
     setTextareaHeight(textarea.scrollHeight);
@@ -15,7 +14,7 @@ function ChatInput({ text, setText, textareaHeight, setTextareaHeight, maxHeight
   console.log("height: ", textareaHeight)
   return (
     <textarea
-      ref={ref}
+      ref={inputRef}
       className="w-full px-4 py-2 placeholder-light-gray/60 text-white outline-none resize-none" 
       placeholder={t("type_message")}
       value={text}

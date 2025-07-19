@@ -2,15 +2,17 @@ import { message } from "antd";
 import axios from "axios";
 import { t } from "i18next";
 
-export const HOST = " https://big-bang-backend.vercel.app";
-export const setTokens = (accessToken, refreshToken) => {
+export const HOST = "http://45.159.248.44:3100";
+export const setTokens = (accessToken, refreshToken, chatToken) => {
   localStorage.setItem('accessToken', accessToken);
   localStorage.setItem('refreshToken', refreshToken);
+  localStorage.setItem('chatToken', chatToken);
 };
 
 export const clearLocalStorage = () => {
   localStorage.removeItem("accessToken");
   localStorage.removeItem("refreshToken");
+  localStorage.removeItem("chatToken")
 }
 
 export const axiosInstance = () => {

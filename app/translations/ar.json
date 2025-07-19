@@ -58,5 +58,7 @@
   "accept_terms": "أوافق على شروط الخدمة وسياسة الخصوصية",
   "registerGreeting": "فلنبدأ معاً",
   "registerTitle": "انشئ حساب جديد",
-  "have_account?": "لديك حساب مسبقاً؟"
+  "have_account?": "لديك حساب مسبقاً؟",
+  "start_chatting": "ابدأ بالدردشة!",
+  "create_group": "إنشاء مجموعة جديدة"
 }

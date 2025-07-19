@@ -58,5 +58,7 @@
   "accept_terms": "I accept the terms of service and privacy policy.",
   "registerGreeting": "LET'S GET STARTED",
   "registerTitle": "Create an account",
-  "have_account?": "Already have an account?"
+  "have_account?": "Already have an account?",
+  "start_chatting": "Start Chatting!",
+  "create_group": "Create a new group"
 }

@@ -1,17 +1,46 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import ChatInput from "./ChatInput";
 import Image from "next/image";
 import { icons } from "@/app/utilities/assets";
 import Message from "./Message";
+import { RocketChatService } from "@/app/sockets/rocketChatService";
 
-function ChatArea() {
+function ChatArea({ chatId }) {
   const ref = useRef(null);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [textareaHeight, setTextareaHeight] = useState(40); // Track textarea height
 
   const maxTextareaHeight = 200; // Set a maximum height for the textarea
+
+  const [chatService, setChatService] = useState(null); // Rocket Chat Service
+  
+  useEffect(() => {
+    const authToken = localStorage?.getItem('chatToken');
+    if (!authToken) {
+      console.error('No auth token available');
+      return;
+    }
+    const rocketChatService = new RocketChatService(
+      authToken
+    );
+    setChatService(rocketChatService);
+    
+    // Subscribe to a room after authentication
+    const subscription = rocketChatService.subscribeToRoom(chatId).subscribe({
+      next: (message) => {
+        // setMessages(prev => [...prev, message]);
+        console.log('chat area message', message)
+      },
+      error: (err) => console.error('Subscription error:', err)
+    });
+    
+    return () => {
+      subscription.unsubscribe();
+      rocketChatService.disconnect();
+    };
+  }, []);
 
   return (
     <div className="flex flex-col flex-1 p-4">
@@ -54,6 +83,7 @@ function ChatArea() {
                 content: message,
               },
             ]);
+            chatService.sendMessage(chatId, message);
             setMessage("");
             ref.current.style.height = 'auto'
             setTextareaHeight(40); // Reset textarea height after sending

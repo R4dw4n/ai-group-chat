@@ -1,9 +1,10 @@
 "use client";
-import useTypewriter from "@/app/hooks/useTypewriter";
+
 import { useInView, motion } from "motion/react";
 import React, { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import PrimaryButton from "../PrimaryButton";
+import useTypewriter from "../../hooks/useTypewriter";
 
 function Hero() {
   const { t } = useTranslation();

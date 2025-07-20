@@ -3,7 +3,7 @@ import Image from "next/image";
 import React from "react";
 import NavbarList from "./NavbarList";
 import LanguageSwitcher from "../LanguageSwitcher/LanguageSwitcher";
-import { images } from "@/app/utilities/assets";
+import { images } from "../../../app/utilities/assets";
 import { useTranslation } from "react-i18next";
 import PrimaryButton from "../PrimaryButton";
 import Link from "next/link";

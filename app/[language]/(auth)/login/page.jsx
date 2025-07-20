@@ -25,11 +25,11 @@ function Page() {
   const [t, i18n] = useTranslation();
   const router = useRouter();
   const [model, setModel] = useState({
-    email: "",
+    username: "",
     password: "",
   });
   const [fieldErrors, setFieldErrors] = useState({
-    email: "",
+    username: "",
     password: "",
   });
   const [loading, setLoading] = useState(false);
@@ -55,11 +55,11 @@ function Page() {
   };
   const handleSubmit = (e) => {
     if (e.preventDefault) e.preventDefault();
-    if (!model.email || !model.password) {
+    if (!model.username || !model.password) {
       setFieldErrors(prev => {
         const ret = {...prev};
-        if (!model.email)
-          ret.email = "Email is required.";
+        if (!model.username)
+          ret.username = "Username is required.";
         if (!model.password)
           ret.password = "Password is required.";
 
@@ -109,22 +109,22 @@ function Page() {
         {/* FIELDS */}
         <div className="relative w-lg px-12">
           <Image
-            alt="email"
-            src={icons.EMAIL}
+            alt="username"
+            src={icons.USER}
             width={25}
             height={25}
             className={`absolute ${fieldIconPosition[i18n.language]}`}
           />
           <input
-            placeholder={t("email_address")}
+            placeholder={t("username")}
             className={`outline-none placeholder:font-semibold placeholder:text-lg text-greeting-gray text-lg w-md h-16 ${
-              fieldErrors.email ? "border-b-3 border-error" : ""
+              fieldErrors.username ? "border-b-3 border-error" : ""
             }`}
-            name="email"
-            type="email"
-            onChange={(e) => fieldValueChanged(e.target.value, "email")}
+            name="username"
+            type="username"
+            onChange={(e) => fieldValueChanged(e.target.value, "username")}
           />
-          <p className="text-error font-semibold">{fieldErrors.email}</p>
+          <p className="text-error font-semibold">{fieldErrors.username}</p>
         </div>
         <div className="relative w-lg px-12">
           <Image

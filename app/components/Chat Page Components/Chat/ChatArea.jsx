@@ -4,9 +4,8 @@ import ChatInput from "./ChatInput";
 import Image from "next/image";
 import { icons } from "@/app/utilities/assets";
 import Message from "./Message";
-import { RocketChatService } from "@/app/sockets/rocketChatService";
 
-function ChatArea({ chatId }) {
+function ChatArea({ chatId, chatService, receivedMessage }) {
   const ref = useRef(null);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
@@ -14,33 +13,21 @@ function ChatArea({ chatId }) {
 
   const maxTextareaHeight = 200; // Set a maximum height for the textarea
 
-  const [chatService, setChatService] = useState(null); // Rocket Chat Service
-  
   useEffect(() => {
-    const authToken = localStorage?.getItem('chatToken');
-    if (!authToken) {
-      console.error('No auth token available');
-      return;
+    if (receivedMessage && receivedMessage.rid === chatId) {
+      setMessages([
+        ...messages,
+        {
+          from: 1,
+          time:
+            new Date(receivedMessage.ts.$date).getHours().toString() +
+            ":" +
+            new Date(receivedMessage.ts.$date).getMinutes().toString(),
+          content: receivedMessage.msg,
+        },
+      ]);
     }
-    const rocketChatService = new RocketChatService(
-      authToken
-    );
-    setChatService(rocketChatService);
-    
-    // Subscribe to a room after authentication
-    const subscription = rocketChatService.subscribeToRoom(chatId).subscribe({
-      next: (message) => {
-        // setMessages(prev => [...prev, message]);
-        console.log('chat area message', message)
-      },
-      error: (err) => console.error('Subscription error:', err)
-    });
-    
-    return () => {
-      subscription.unsubscribe();
-      rocketChatService.disconnect();
-    };
-  }, []);
+  }, [receivedMessage]);
 
   return (
     <div className="flex flex-col flex-1 p-4">
@@ -85,7 +72,7 @@ function ChatArea({ chatId }) {
             ]);
             chatService.sendMessage(chatId, message);
             setMessage("");
-            ref.current.style.height = 'auto'
+            ref.current.style.height = "auto";
             setTextareaHeight(40); // Reset textarea height after sending
           }}
         />

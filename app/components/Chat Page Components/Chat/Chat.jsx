@@ -1,15 +1,18 @@
-import React from 'react'
-import ChatToolbar from './ChatToolbar'
-import ChatArea from './ChatArea'
+import React from "react";
+import ChatToolbar from "./ChatToolbar";
+import ChatArea from "./ChatArea";
 
-function Chat({ chatId }) {
-
+function Chat({ chatId, chatService, receivedMessage }) {
   return (
-    <div className='h-screen flex-1'>
+    <div className="h-screen flex-1">
       <ChatToolbar />
-      <ChatArea chatId={chatId} />
+      <ChatArea
+        chatId={chatId}
+        chatService={chatService}
+        receivedMessage={receivedMessage}
+      />
     </div>
-  )
+  );
 }
 
-export default Chat
+export default Chat;

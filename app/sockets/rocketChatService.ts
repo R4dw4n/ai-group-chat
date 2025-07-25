@@ -29,15 +29,19 @@ interface RocketChatMessage {
 export class RocketChatService {
   private socket$: WebSocketSubject<RocketChatMessage>;
   private messageStream$ = new Subject<any>();
+  private isConnected$ = new Subject<boolean>();
   private messageId = 0;
   private url: string;
   private authToken: string;
+  private username: string;
 
   constructor(
     token: string,
+    username: string,
     serverUrl: string = "wss://45-159-248-44.nip.io/websocket"
   ) {
     this.url = serverUrl;
+    this.username = username;
     this.updateAuthToken(token);
     this.connect();
   }
@@ -60,6 +64,7 @@ export class RocketChatService {
       closeObserver: {
         next: () => {
           console.log("Disconnected from Rocket.Chat");
+          this.isConnected$.next(false);
           // Implement reconnection logic if needed
         },
       },
@@ -117,6 +122,10 @@ export class RocketChatService {
     this.socket$.next(authMessage);
   }
 
+  public isConnected() {
+    return this.isConnected$.asObservable();
+  }
+
   public subscribeToRoom(roomId: string): Observable<any> {
     const subId = (++this.messageId).toString();
 
@@ -129,19 +138,19 @@ export class RocketChatService {
     });
 
     // Subscribe to room changes (optional)
-    this.socket$.next({
-      msg: "sub",
-      id: (++this.messageId).toString(),
-      name: "stream-notify-room",
-      params: [`${roomId}/typing`, false],
-    });
+    // this.socket$.next({
+    //   msg: "sub",
+    //   id: (++this.messageId).toString(),
+    //   name: "stream-notify-room",
+    //   params: [`${roomId}/typing`, false],
+    // });
 
     // Return an observable filtered for this room's messages
     return this.messageStream$.pipe(
       filter(
         (message: any) =>
           message.collection === "stream-room-messages" &&
-          message.fields?.args[0]?.rid === roomId
+          message.fields?.args[0]?.u?.username !== this.username
       ),
       map((message) => message.fields.args[0])
     );
@@ -154,6 +163,7 @@ export class RocketChatService {
           "Successfully connected to Rocket.Chat with session:",
           msg.session
         );
+        this.isConnected$.next(true);
         // If we have an auth token, authenticate now
         if (this.authToken) {
           this.authenticate();
@@ -164,11 +174,7 @@ export class RocketChatService {
           this.messageStream$.next(msg);
         }
         break;
-      case "connected":
-        console.log("Successfully connected to Rocket.Chat");
-        break;
       case "result":
-        console.log("Method result:", msg);
         // Handle authentication result
         if (msg.id === this.messageId.toString() && msg.method === "login") {
           if (msg.error) {

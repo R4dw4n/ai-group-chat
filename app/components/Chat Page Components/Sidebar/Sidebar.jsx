@@ -74,7 +74,7 @@ const chatItems = [
   },
 ];
 
-function Sidebar() {
+function Sidebar({ groups }) {
   return (
     <ResizableDiv className="h-screen bg-dark-gray @container" initialWidth={400}>
       <div className="flex gap-2 p-4 items-center">
@@ -87,7 +87,7 @@ function Sidebar() {
         <SearchChat className="hidden @[100px]:block" />
       </div>
       <div className="overflow-y-auto w-full h-[calc(100vh-80px)]">
-        {chatItems.map((chat, ind) => (
+        {groups.map((chat, ind) => (
           <ChatItem chat={chat} key={ind} />
         ))}
       </div>

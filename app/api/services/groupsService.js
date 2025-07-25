@@ -30,4 +30,11 @@ export const groupsService = {
   delete: async (id) => {
     return await axiosInstance().get(`/groups/delete/${id}`)
   },
+  searchUser: async (params) => {
+    return await axiosInstance().get("/users/autocomplete", {
+      params: {
+        ...params
+      }
+    })
+  }
 }

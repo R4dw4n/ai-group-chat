@@ -74,7 +74,7 @@ function Page() {
       setLoading(true);
       const res = await authService.login(model);
       message.success(t("success"), 2);
-      setTokens(res.data.accessToken, res.data.refreshToken, res.data.authToken);
+      setTokens(res.data.accessToken, res.data.refreshToken, res.data.authToken, model.username);
       router.push("/chats");
     } catch (error) {
       console.log(error);

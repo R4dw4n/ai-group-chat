@@ -3,6 +3,7 @@ import { groupsService } from "@/app/api/services/groupsService";
 import Chat from "@/app/components/Chat Page Components/Chat/Chat";
 import Sidebar from "@/app/components/Chat Page Components/Sidebar/Sidebar";
 import PrimaryButton from "@/app/components/PrimaryButton";
+import { RocketChatService } from "@/app/sockets/rocketChatService";
 import {
   ConfigProvider,
   Form,
@@ -13,9 +14,10 @@ import {
   Upload,
   Image,
   App,
+  message,
 } from "antd";
 import { t } from "i18next";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -27,14 +29,71 @@ function Page() {
   const [openModal, setOpenModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
-  const [model, setModel] = useState({
-    members: [],
-    name: "",
-  });
-  const [fieldErrors, setFieldErrors] = useState({
-    members: "",
-    name: "",
-  });
+  const [groups, setGroups] = useState([]);
+
+  const [chatService, setChatService] = useState(null); // Rocket Chat Service
+  const [connected, setConnected] = useState(false);
+  const [receivedMessage, setReceivedMessage] = useState(null);
+
+  useEffect(() => {
+    const authToken = localStorage?.getItem("chatToken");
+    const username = localStorage?.getItem("username");
+    if (!authToken) {
+      console.error("No auth token available");
+      return;
+    }
+    const rocketChatService = new RocketChatService(authToken, username);
+    setChatService(rocketChatService);
+    const connectionSub = rocketChatService
+      .isConnected()
+      .subscribe((_connected) => {
+        console.log("subscribing to isConnected", _connected);
+        setConnected(_connected);
+      });
+    let res;
+    setLoading(true);
+    const getGroups = async () => {
+      try {
+        res = await groupsService.getAll({});
+        setGroups(res.data);
+      } catch (error) {
+        message.error(error.response.data.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    getGroups();
+
+    return () => {
+      connectionSub.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    console.log("here", connected);
+    if (chatService === null || groups.length === 0 || !connected)
+      return () => {};
+    // Subscribe to a room after authentication
+    let subscriptions = [];
+    groups.forEach((group) => {
+      const subscription = chatService.subscribeToRoom(group.id).subscribe({
+        next: (message) => {
+          setReceivedMessage({ ...message });
+          console.log("chat page message", message);
+        },
+        error: (err) => console.error("Subscription error:", err),
+      });
+      subscriptions.push(subscription);
+    });
+
+    return () => {
+      subscriptions.forEach((sub) => {
+        sub.unsubscribe();
+      });
+      chatService.disconnect();
+    };
+  }, [groups, chatService, connected]);
+
   const handleCancel = () => {
     setOpenModal(false);
   };
@@ -43,7 +102,7 @@ function Page() {
   }, [chatId]);
   return (
     <div className="flex h-screen w-screen">
-      <Sidebar />
+      <Sidebar groups={groups} />
       {chatId === null ? (
         <>
           <div className="m-auto">
@@ -57,12 +116,6 @@ function Page() {
           <ConfigProvider
             theme={{
               algorithm: darkAlgorithm,
-              // components: {
-              //   Modal: {
-              //     contentBg: '#151523',
-              //     titleColor: '#ffffff',
-              //   },
-              // },
             }}
           >
             <Modal
@@ -71,18 +124,16 @@ function Page() {
               onCancel={handleCancel}
               onOk={() => form.submit()}
             >
-              <CreateGroupModal
-                model={model}
-                setModel={setModel}
-                fieldErrors={fieldErrors}
-                setFieldErrors={setFieldErrors}
-                form={form}
-              />
+              <CreateGroupModal form={form} setOpenModal={setOpenModal} />
             </Modal>
           </ConfigProvider>
         </>
       ) : (
-        <Chat chatId={chatId} />
+        <Chat
+          chatId={chatId}
+          chatService={chatService}
+          receivedMessage={receivedMessage}
+        />
       )}
     </div>
   );
@@ -132,12 +183,12 @@ const getBase64 = (file) =>
     reader.onerror = (error) => reject(error);
   });
 
-const CreateGroupModal = ({ model, setModel, setFieldErrors, form }) => {
+const CreateGroupModal = ({ form, setOpenModal }) => {
+  const { i18n } = useTranslation();
+  const router = useRouter();
   const { message } = App.useApp();
   const [loading, setLoading] = useState(false);
-  const [options, setOptions] = useState([
-    { value: "dNoqyeujvNKeSXfMG", label: "Radwan2" },
-  ]);
+  const [options, setOptions] = useState([]);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [fileList, setFileList] = useState([]);
@@ -153,32 +204,28 @@ const CreateGroupModal = ({ model, setModel, setFieldErrors, form }) => {
 
   const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
 
-  useEffect(() => {
-    console.log(fileList);
-  }, [fileList]);
-
   const uploadButton = (
     <button style={{ border: 0, background: "none" }} type="button">
       <span className="text-6xl text-white block">+</span>
       <span className="text-white mb-2 block">{t("upload")}</span>
     </button>
   );
-  const fieldValueChanged = (value, fieldName) => {
-    setModel((prev) => {
-      return {
-        ...prev,
-        [fieldName]: value,
-      };
-    });
-    setFieldErrors((prev) => {
-      return {
-        ...prev,
-        [fieldName]: "",
-      };
-    });
-  };
   const handleSelectChange = (value, option) => {
     console.log(value, option);
+  };
+  const handleSearch = async (value) => {
+    try {
+      const res = await groupsService.searchUser({ searchTerm: value });
+      const opts = res.data.map((user) => {
+        return {
+          label: user.name,
+          value: user.id,
+        };
+      });
+      setOptions([...opts]);
+    } catch (error) {
+      console.log(error);
+    }
   };
   const handleFormSubmit = async (values) => {
     console.log("values", values);
@@ -188,21 +235,22 @@ const CreateGroupModal = ({ model, setModel, setFieldErrors, form }) => {
       setLoading(true);
       res = await groupsService.create({ name: values.name });
       const addMembersRes = await groupsService.addUsers(res.data._id, {
-        userIds: [...values.members]
+        userIds: [...values.members],
       });
       if (fileList.length > 0) {
-        const avatarRes = await groupsService.addAvatar(
-          res.data._id,
-          { image: fileList[0].originFileObj }
-        );
+        const avatarRes = await groupsService.addAvatar(res.data._id, {
+          image: fileList[0].originFileObj,
+        });
       }
-      message.success(t("success"), 2);
-      router.push(`/chats?chatId=${res.data._id}`);
+      // FIX MESSAGE FUNCTIONS AND MOVE THE WEBSOCKET CONNECTION LOGIC TO THIS PAGE INSTEAD OF CHAT AREA
+      // message.success(t("success"), 2);
+      setOpenModal(false);
+      router.push(`/${i18n.language}/chats?chatId=${res.data._id}`);
     } catch (error) {
       console.log(error);
       if (error.response) {
-        if(res?.data?._id) {
-          await groupsService.delete(res.data._id)
+        if (res?.data?._id) {
+          await groupsService.delete(res.data._id);
         }
         message.error(error.response.data.message, 2);
       }
@@ -234,7 +282,9 @@ const CreateGroupModal = ({ model, setModel, setFieldErrors, form }) => {
             showSearch
             allowClear
             mode="multiple"
+            optionFilterProp="label"
             onChange={handleSelectChange}
+            onSearch={handleSearch}
             className="w-full"
           />
         </Form.Item>

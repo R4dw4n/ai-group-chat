@@ -3,16 +3,18 @@ import axios from "axios";
 import { t } from "i18next";
 
 export const HOST = "http://45.159.248.44:3100";
-export const setTokens = (accessToken, refreshToken, chatToken) => {
+export const setTokens = (accessToken, refreshToken, chatToken, username) => {
   localStorage.setItem('accessToken', accessToken);
   localStorage.setItem('refreshToken', refreshToken);
   localStorage.setItem('chatToken', chatToken);
+  localStorage.setItem('username', username);
 };
 
 export const clearLocalStorage = () => {
   localStorage.removeItem("accessToken");
   localStorage.removeItem("refreshToken");
-  localStorage.removeItem("chatToken")
+  localStorage.removeItem("chatToken");
+  localStorage.removeItem("username");
 }
 
 export const axiosInstance = () => {
@@ -48,10 +50,10 @@ export const axiosInstance = () => {
               Authorization: "Bearer " + localStorage.getItem("refreshToken"),
             },
           });
-          const { accessToken } = response.data;
+          const { accessToken, authToken } = response.data;
           console.log("Token Refreshed!");
           // Store new tokens
-          setTokens(accessToken, localStorage.getItem("refreshToken"));
+          setTokens(accessToken, localStorage.getItem("refreshToken"), authToken, localStorage.getItem("username"));
           // Update the Authorization header and retry the request
           instance.defaults.headers.Authorization = `Bearer ${accessToken}`;
           originalRequest.headers.Authorization = `Bearer ${accessToken}`;

@@ -7,21 +7,34 @@ const messageTail = {
 const messageStyle = {
   0: "bg-dark-gray self-end",
   1: "bg-gray",
-}
+};
 const timeStyle = {
   0: "text-gray",
-  1: "text-dark-gray/75"
-}
+  1: "text-dark-gray/75",
+};
+const formatTime = (timestamp) => {
+  return new Date(timestamp).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
 function Message({ message }) {
   return (
-    <div className={`w-32 relative ${messageStyle[message.from]} text-white py-2 px-3 rounded-3xl`}>
+    <div
+      className={`w-32 relative ${
+        messageStyle[message.from]
+      } text-white py-2 px-3 rounded-3xl`}
+    >
       <div
         className={`absolute ${
           messageTail[message.from]
         } bottom-0.5 w-0 h-0 border-l-[13px] border-l-transparent border-r-[13px] border-r-transparent border-b-[13px]`}
       ></div>
       <h5 className="text-white max-w-full break-words">{message?.content}</h5>
-      <h5 className={`${timeStyle[message.from]}`}>{message?.time}</h5>
+      <h5 className={`${timeStyle[message.from]}`}>
+        {formatTime(message?.time)}
+      </h5>
     </div>
   );
 }

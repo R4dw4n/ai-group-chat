@@ -3,7 +3,6 @@ import { groupsService } from "@/app/api/services/groupsService";
 import Chat from "@/app/components/Chat Page Components/Chat/Chat";
 import Sidebar from "@/app/components/Chat Page Components/Sidebar/Sidebar";
 import PrimaryButton from "@/app/components/PrimaryButton";
-import { RocketChatService } from "@/app/sockets/rocketChatService";
 import {
   ConfigProvider,
   Form,
@@ -14,13 +13,13 @@ import {
   Upload,
   Image,
   App,
-  message,
 } from "antd";
 import { t } from "i18next";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-
+import useChatConnect from "../../hooks/useChatConnect";
+import {messages} from "../../utilities/messages";
 const { darkAlgorithm } = theme;
 
 function Page() {
@@ -31,42 +30,23 @@ function Page() {
   const [form] = Form.useForm();
   const [groups, setGroups] = useState([]);
 
-  const [chatService, setChatService] = useState(null); // Rocket Chat Service
-  const [connected, setConnected] = useState(false);
+  const { connected, chatService } = useChatConnect();
   const [receivedMessage, setReceivedMessage] = useState(null);
 
   useEffect(() => {
-    const authToken = localStorage?.getItem("chatToken");
-    const username = localStorage?.getItem("username");
-    if (!authToken) {
-      console.error("No auth token available");
-      return;
-    }
-    const rocketChatService = new RocketChatService(authToken, username);
-    setChatService(rocketChatService);
-    const connectionSub = rocketChatService
-      .isConnected()
-      .subscribe((_connected) => {
-        console.log("subscribing to isConnected", _connected);
-        setConnected(_connected);
-      });
-    let res;
-    setLoading(true);
     const getGroups = async () => {
+      let res;
       try {
         res = await groupsService.getAll({});
         setGroups(res.data);
       } catch (error) {
-        message.error(error.response.data.message);
+        console.log('here', error);
+        messages("error", error.response.data.message);
       } finally {
         setLoading(false);
       }
     };
     getGroups();
-
-    return () => {
-      connectionSub.unsubscribe();
-    };
   }, []);
 
   useEffect(() => {
@@ -243,7 +223,7 @@ const CreateGroupModal = ({ form, setOpenModal }) => {
         });
       }
       // FIX MESSAGE FUNCTIONS AND MOVE THE WEBSOCKET CONNECTION LOGIC TO THIS PAGE INSTEAD OF CHAT AREA
-      // message.success(t("success"), 2);
+      messages("success", t("success"), 2);
       setOpenModal(false);
       router.push(`/${i18n.language}/chats?chatId=${res.data._id}`);
     } catch (error) {
@@ -252,7 +232,7 @@ const CreateGroupModal = ({ form, setOpenModal }) => {
         if (res?.data?._id) {
           await groupsService.delete(res.data._id);
         }
-        message.error(error.response.data.message, 2);
+        messages("error", error.response.data.message, 2);
       }
     } finally {
       setLoading(false);

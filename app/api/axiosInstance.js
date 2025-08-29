@@ -2,7 +2,7 @@ import { message } from "antd";
 import axios from "axios";
 import { t } from "i18next";
 
-export const HOST = "http://45.159.248.44:3100";
+export const HOST = "https://api.45-159-248-44.nip.io";
 export const setTokens = (accessToken, refreshToken, chatToken, username) => {
   localStorage.setItem('accessToken', accessToken);
   localStorage.setItem('refreshToken', refreshToken);

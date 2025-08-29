@@ -15,6 +15,13 @@ export const groupsService = {
       }
     })
   },
+  getMessages: async (id, params) => {
+    return await axiosInstance().get(`/groups/${id}/messages`, {
+      params: {
+        ...params,
+      }
+    })
+  },
   rename: async (id, data) => {
     return await axiosInstance().post(`/groups/rename/${id}`, data)
   },

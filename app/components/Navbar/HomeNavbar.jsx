@@ -23,7 +23,7 @@ function HomeNavbar() {
       </div>
       <div className={`flex items-center justify-center ${paddingStyle[i18n.language]} pt-4 gap-4`}>
         <LanguageSwitcher />
-        <Link href="/login">
+        <Link href={`/${i18n.language}/login`}>
           <PrimaryButton>
             {t("login")}
           </PrimaryButton>

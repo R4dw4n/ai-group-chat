@@ -15,6 +15,9 @@ export const groupsService = {
       }
     })
   },
+  getGroup: async (id) => {
+    return await axiosInstance().get(`/groups/${id}`)
+  },
   getMessages: async (id, params) => {
     return await axiosInstance().get(`/groups/${id}/messages`, {
       params: {

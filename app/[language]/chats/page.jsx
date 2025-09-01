@@ -19,7 +19,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import useChatConnect from "../../hooks/useChatConnect";
-import {messages} from "../../utilities/messages";
+import { messages } from "../../utilities/messages";
 const { darkAlgorithm } = theme;
 
 function Page() {
@@ -40,7 +40,7 @@ function Page() {
         res = await groupsService.getAll({});
         setGroups(res.data);
       } catch (error) {
-        console.log('here', error);
+        console.log("here", error);
         messages("error", error.response.data.message);
       } finally {
         setLoading(false);
@@ -60,6 +60,18 @@ function Page() {
         next: (message) => {
           setReceivedMessage({ ...message });
           console.log("chat page message", message);
+
+          // Reorder groups to put the group that received the message first
+          setGroups((prevGroups) => {
+            const groupIndex = prevGroups.findIndex((g) => g.id === group.id);
+            if (groupIndex === -1) return prevGroups;
+
+            const updatedGroups = [...prevGroups];
+            const [movedGroup] = updatedGroups.splice(groupIndex, 1);
+            updatedGroups.unshift(movedGroup);
+
+            return updatedGroups;
+          });
         },
         error: (err) => console.error("Subscription error:", err),
       });
@@ -111,6 +123,8 @@ function Page() {
       ) : (
         <Chat
           chatId={chatId}
+          groups={groups}
+          setGroups={setGroups}
           chatService={chatService}
           receivedMessage={receivedMessage}
         />

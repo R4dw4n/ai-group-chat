@@ -60,5 +60,9 @@
   "registerTitle": "Create an account",
   "have_account?": "Already have an account?",
   "start_chatting": "Start Chatting!",
-  "create_group": "Create a new group"
+  "create_group": "Create a new group",
+  "group_settings": "Group Settings",
+  "members": "Members",
+  "group_name": "Group Name",
+  "add_members": "Add Members"
 }

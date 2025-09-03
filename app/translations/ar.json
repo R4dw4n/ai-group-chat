@@ -60,5 +60,9 @@
   "registerTitle": "انشئ حساب جديد",
   "have_account?": "لديك حساب مسبقاً؟",
   "start_chatting": "ابدأ بالدردشة!",
-  "create_group": "إنشاء مجموعة جديدة"
+  "create_group": "إنشاء مجموعة جديدة",
+  "group_settings": "إعدادات المجموعة",
+  "members": "الأعضاء",
+  "group_name": "اسم المجموعة",
+  "add_members": "إضافة أعضاء"
 }

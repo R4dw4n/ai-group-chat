@@ -150,7 +150,8 @@ export class RocketChatService {
       filter(
         (message: any) =>
           message.collection === "stream-room-messages" &&
-          message.fields?.args[0]?.u?.username !== this.username
+          message.fields?.args[0]?.u?.username !== this.username &&
+          message.fields?.args[0]?.rid === roomId
       ),
       map((message) => message.fields.args[0])
     );

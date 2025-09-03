@@ -8,6 +8,7 @@ import { groupsService } from "@/app/api/services/groupsService";
 function Chat({ chatId, chatService, receivedMessage }) {
   const [loading, setLoading] = useState(false);
   const [group, setGroup] = useState(null);
+  const [members, setMembers] = useState([]);
   useEffect(() => {
     const getGroup = async () => {
       try {
@@ -21,7 +22,19 @@ function Chat({ chatId, chatService, receivedMessage }) {
       }
     };
     getGroup();
-  }, []);
+    const getMembers = async () => {
+      try {
+        setLoading(true);
+        const res = await groupsService.getMembers(chatId);
+        setMembers(res.data);
+      } catch (error) {
+        messages("error", error.response.data.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    getMembers();
+  }, [chatId]);
   return (
     <div className="h-screen flex-1">
       {loading ? (
@@ -30,7 +43,13 @@ function Chat({ chatId, chatService, receivedMessage }) {
         <>
           {group !== null ? (
             <>
-              <ChatToolbar group={group} chatId={chatId} />
+              <ChatToolbar
+                group={group}
+                setGroup={setGroup}
+                chatId={chatId}
+                members={members}
+                setMembers={setMembers}
+              />
               <ChatArea
                 chatId={chatId}
                 chatService={chatService}

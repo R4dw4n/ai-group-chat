@@ -5,7 +5,6 @@ export const groupsService = {
     return await axiosInstance().post("/groups", data)
   },
   addAvatar: async (id, data) => {
-    console.log('data', data)
     return await axiosInstance().postForm(`/groups/${id}/avatar`, data)
   },
   getAll: async (params) => {
@@ -24,6 +23,9 @@ export const groupsService = {
         ...params,
       }
     })
+  },
+  getMembers: async (id) => {
+    return await axiosInstance().get(`/groups/${id}/members`)
   },
   rename: async (id, data) => {
     return await axiosInstance().post(`/groups/rename/${id}`, data)

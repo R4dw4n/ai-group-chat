@@ -3,6 +3,7 @@ import { groupsService } from "@/app/api/services/groupsService";
 import Chat from "@/app/components/Chat Page Components/Chat/Chat";
 import Sidebar from "@/app/components/Chat Page Components/Sidebar/Sidebar";
 import PrimaryButton from "@/app/components/PrimaryButton";
+import AvatarUpload from "@/app/utilities/AvatarUpload";
 import {
   ConfigProvider,
   Form,
@@ -10,9 +11,6 @@ import {
   Modal,
   Select,
   theme,
-  Upload,
-  Image,
-  App,
 } from "antd";
 import { t } from "i18next";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -28,6 +26,7 @@ function Page() {
   const [openModal, setOpenModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
+  const [initialGroups, setInitialGroups] = useState([]);
   const [groups, setGroups] = useState([]);
 
   const { connected, chatService } = useChatConnect();
@@ -39,8 +38,8 @@ function Page() {
       try {
         res = await groupsService.getAll({});
         setGroups(res.data);
+        setInitialGroups(res.data);
       } catch (error) {
-        console.log("here", error);
         messages("error", error.response.data.message);
       } finally {
         setLoading(false);
@@ -51,25 +50,22 @@ function Page() {
 
   useEffect(() => {
     console.log("here", connected);
-    if (chatService === null || groups.length === 0 || !connected)
+    if (chatService === null || initialGroups.length === 0 || !connected)
       return () => {};
     // Subscribe to a room after authentication
     let subscriptions = [];
-    groups.forEach((group) => {
+    initialGroups.forEach((group) => {
       const subscription = chatService.subscribeToRoom(group.id).subscribe({
         next: (message) => {
           setReceivedMessage({ ...message });
-          console.log("chat page message", message);
 
           // Reorder groups to put the group that received the message first
           setGroups((prevGroups) => {
             const groupIndex = prevGroups.findIndex((g) => g.id === group.id);
             if (groupIndex === -1) return prevGroups;
-
-            const updatedGroups = [...prevGroups];
+            let updatedGroups = [...prevGroups];
             const [movedGroup] = updatedGroups.splice(groupIndex, 1);
-            updatedGroups.unshift(movedGroup);
-
+            updatedGroups = [movedGroup, ...updatedGroups];
             return updatedGroups;
           });
         },
@@ -84,14 +80,12 @@ function Page() {
       });
       chatService.disconnect();
     };
-  }, [groups, chatService, connected]);
+  }, [initialGroups, chatService, connected]);
 
   const handleCancel = () => {
     setOpenModal(false);
   };
-  useEffect(() => {
-    console.log(chatId);
-  }, [chatId]);
+
   return (
     <div className="flex h-screen w-screen">
       <Sidebar groups={groups} />
@@ -135,75 +129,15 @@ function Page() {
 
 export default Page;
 
-var __awaiter =
-  (this && this.__awaiter) ||
-  function (thisArg, _arguments, P, generator) {
-    function adopt(value) {
-      return value instanceof P
-        ? value
-        : new P(function (resolve) {
-            resolve(value);
-          });
-    }
-    return new (P || (P = Promise))(function (resolve, reject) {
-      function fulfilled(value) {
-        try {
-          step(generator.next(value));
-        } catch (e) {
-          reject(e);
-        }
-      }
-      function rejected(value) {
-        try {
-          step(generator["throw"](value));
-        } catch (e) {
-          reject(e);
-        }
-      }
-      function step(result) {
-        result.done
-          ? resolve(result.value)
-          : adopt(result.value).then(fulfilled, rejected);
-      }
-      step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-  };
-
-const getBase64 = (file) =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = (error) => reject(error);
-  });
-
 const CreateGroupModal = ({ form, setOpenModal }) => {
   const { i18n } = useTranslation();
   const router = useRouter();
-  const { message } = App.useApp();
   const [loading, setLoading] = useState(false);
   const [options, setOptions] = useState([]);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [fileList, setFileList] = useState([]);
 
-  const handlePreview = (file) =>
-    __awaiter(void 0, void 0, void 0, function* () {
-      if (!file.url && !file.preview) {
-        file.preview = yield getBase64(file.originFileObj);
-      }
-      setPreviewImage(file.url || file.preview);
-      setPreviewOpen(true);
-    });
-
-  const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
-
-  const uploadButton = (
-    <button style={{ border: 0, background: "none" }} type="button">
-      <span className="text-6xl text-white block">+</span>
-      <span className="text-white mb-2 block">{t("upload")}</span>
-    </button>
-  );
   const handleSelectChange = (value, option) => {
     console.log(value, option);
   };
@@ -222,8 +156,6 @@ const CreateGroupModal = ({ form, setOpenModal }) => {
     }
   };
   const handleFormSubmit = async (values) => {
-    console.log("values", values);
-    console.log("fileList", fileList);
     let res;
     try {
       setLoading(true);
@@ -296,25 +228,14 @@ const CreateGroupModal = ({ form, setOpenModal }) => {
           <Input className="w-100" />
         </Form.Item>
       </Form>
-      <Upload
-        listType="picture-circle"
+      <AvatarUpload
         fileList={fileList}
-        onPreview={handlePreview}
-        onChange={handleChange}
-      >
-        {fileList.length > 0 ? null : uploadButton}
-      </Upload>
-      {previewImage && (
-        <Image
-          wrapperStyle={{ display: "none" }}
-          preview={{
-            visible: previewOpen,
-            onVisibleChange: (visible) => setPreviewOpen(visible),
-            afterOpenChange: (visible) => !visible && setPreviewImage(""),
-          }}
-          src={previewImage}
-        />
-      )}
+        previewImage={previewImage}
+        previewOpen={previewOpen}
+        setFileList={setFileList}
+        setPreviewImage={setPreviewImage}
+        setPreviewOpen={setPreviewOpen}
+      />
     </>
   );
 };

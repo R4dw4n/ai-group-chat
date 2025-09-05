@@ -4,14 +4,7 @@ import Chat from "@/app/components/Chat Page Components/Chat/Chat";
 import Sidebar from "@/app/components/Chat Page Components/Sidebar/Sidebar";
 import PrimaryButton from "@/app/components/PrimaryButton";
 import AvatarUpload from "@/app/utilities/AvatarUpload";
-import {
-  ConfigProvider,
-  Form,
-  Input,
-  Modal,
-  Select,
-  theme,
-} from "antd";
+import { ConfigProvider, Form, Input, Modal, Select, theme } from "antd";
 import { t } from "i18next";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -55,22 +48,7 @@ function Page() {
     // Subscribe to a room after authentication
     let subscriptions = [];
     initialGroups.forEach((group) => {
-      const subscription = chatService.subscribeToRoom(group.id).subscribe({
-        next: (message) => {
-          setReceivedMessage({ ...message });
-
-          // Reorder groups to put the group that received the message first
-          setGroups((prevGroups) => {
-            const groupIndex = prevGroups.findIndex((g) => g.id === group.id);
-            if (groupIndex === -1) return prevGroups;
-            let updatedGroups = [...prevGroups];
-            const [movedGroup] = updatedGroups.splice(groupIndex, 1);
-            updatedGroups = [movedGroup, ...updatedGroups];
-            return updatedGroups;
-          });
-        },
-        error: (err) => console.error("Subscription error:", err),
-      });
+      const subscription = subscribeToGroup(group);
       subscriptions.push(subscription);
     });
 
@@ -81,6 +59,26 @@ function Page() {
       chatService.disconnect();
     };
   }, [initialGroups, chatService, connected]);
+
+  const subscribeToGroup = (group) => {
+    const subscription = chatService.subscribeToRoom(group.id).subscribe({
+      next: (message) => {
+        setReceivedMessage({ ...message });
+
+        // Reorder groups to put the group that received the message first
+        setGroups((prevGroups) => {
+          const groupIndex = prevGroups.findIndex((g) => g.id === group.id);
+          if (groupIndex === -1) return prevGroups;
+          let updatedGroups = [...prevGroups];
+          const [movedGroup] = updatedGroups.splice(groupIndex, 1);
+          updatedGroups = [movedGroup, ...updatedGroups];
+          return updatedGroups;
+        });
+      },
+      error: (err) => console.error("Subscription error:", err),
+    });
+    return subscription;
+  };
 
   const handleCancel = () => {
     setOpenModal(false);
@@ -110,7 +108,12 @@ function Page() {
               onCancel={handleCancel}
               onOk={() => form.submit()}
             >
-              <CreateGroupModal form={form} setOpenModal={setOpenModal} />
+              <CreateGroupModal
+                form={form}
+                setOpenModal={setOpenModal}
+                chatService={chatService}
+                subscribeToGroup={subscribeToGroup}
+              />
             </Modal>
           </ConfigProvider>
         </>
@@ -129,7 +132,7 @@ function Page() {
 
 export default Page;
 
-const CreateGroupModal = ({ form, setOpenModal }) => {
+const CreateGroupModal = ({ form, setOpenModal, chatService, subscribeToGroup }) => {
   const { i18n } = useTranslation();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -157,9 +160,11 @@ const CreateGroupModal = ({ form, setOpenModal }) => {
   };
   const handleFormSubmit = async (values) => {
     let res;
+    let subscription;
     try {
       setLoading(true);
       res = await groupsService.create({ name: values.name });
+      subscription = subscribeToGroup({...res.data, id: res.data._id });
       const addMembersRes = await groupsService.addUsers(res.data._id, {
         userIds: [...values.members],
       });
@@ -177,6 +182,7 @@ const CreateGroupModal = ({ form, setOpenModal }) => {
       if (error.response) {
         if (res?.data?._id) {
           await groupsService.delete(res.data._id);
+          subscription.unsubscribe();
         }
         messages("error", error.response.data.message, 2);
       }

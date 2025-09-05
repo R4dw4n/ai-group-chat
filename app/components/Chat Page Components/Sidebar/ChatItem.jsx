@@ -13,22 +13,23 @@ function ChatItem({ chat }) {
       className="flex items-center justify-center px-4 py-2 w-full"
     >
       <div className="overflow-hidden flex rounded-full w-12 h-12">
-        {chat?.avatarUrl && chat?.avatarUrl.includes("etag") && (
+        {chat?.avatarUrl && (
           <Image
             alt="profile-pic"
             src={chat?.avatarUrl}
             width={48}
             height={48}
+            unoptimized={!chat?.avatarUrl.includes("etag")}
           />
         )}
-        {(!chat?.avatarUrl || !chat?.avatarUrl.includes("etag")) && (
+        {/* {(!chat?.avatarUrl || !chat?.avatarUrl.includes("etag")) && (
           <Image
             alt="profile-pic"
             src={images.PROFILE}
             width={48}
             height={48}
           />
-        )}
+        )} */}
       </div>
       <div className="p-2 hidden @[200px]:block flex-1">
         <div className="flex justify-between items-center">

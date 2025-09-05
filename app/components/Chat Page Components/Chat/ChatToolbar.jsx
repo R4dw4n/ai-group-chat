@@ -88,20 +88,13 @@ function ChatToolbar({ chatId, group, members, setGroup, setMembers }) {
           <button className="cursor-pointer" onClick={handleOpenGroupModal}>
             <div className="flex items-center gap-2">
               <div className="overflow-hidden flex rounded-full w-12 h-12">
-                {group?.avatarUrl && group?.avatarUrl.includes("etag") && (
+                {group?.avatarUrl  && (
                   <Image
                     alt="profile-pic"
                     src={group?.avatarUrl}
                     width={48}
                     height={48}
-                  />
-                )}
-                {(!group?.avatarUrl || !group?.avatarUrl.includes("etag")) && (
-                  <Image
-                    alt="profile-pic"
-                    src={images.PROFILE}
-                    width={48}
-                    height={48}
+                    unoptimized={!group?.avatarUrl.includes("etag")}
                   />
                 )}
               </div>

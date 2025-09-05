@@ -2,11 +2,17 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import ChatInput from "./ChatInput";
 import Image from "next/image";
-import { icons } from "@/app/utilities/assets";
+import { icons, images } from "@/app/utilities/assets";
 import Message from "./Message";
 import { groupsService } from "@/app/api/services/groupsService";
 import { messages as messagesF } from "@/app/utilities/messages";
-function ChatArea({ chatId, chatService, receivedMessage }) {
+function ChatArea({
+  chatId,
+  chatService,
+  receivedMessage,
+  members,
+  setMembers,
+}) {
   const ref = useRef(null);
   const chatContainerRef = useRef(null);
 
@@ -38,6 +44,10 @@ function ChatArea({ chatId, chatService, receivedMessage }) {
         from: 0,
         time: new Date(),
         content: message,
+        user: {
+          name: localStorage.getItem("username"),
+        },
+        type: "normal",
       },
     ]);
     chatService.sendMessage(chatId, message);
@@ -69,8 +79,9 @@ function ChatArea({ chatId, chatService, receivedMessage }) {
           result.data
             .map((msg) => {
               return {
+                ...msg,
                 content: msg.message,
-                from: msg.sender === username ? 0 : 1,
+                from: msg.sender === username ? 0 : msg.sender === "ai-general" ? 2 : 1,
                 time: msg.timestamp,
               };
             })
@@ -104,8 +115,9 @@ function ChatArea({ chatId, chatService, receivedMessage }) {
       setMessages((prev) => {
         let res = newMessages.map((msg) => {
           return {
+            ...msg,
             content: msg.message,
-            from: msg.sender === username ? 0 : 1,
+            from: msg.sender === username ? 0 : msg.sender === "ai-general" ? 2 : 1,
             time: msg.timestamp,
           };
         });
@@ -166,10 +178,28 @@ function ChatArea({ chatId, chatService, receivedMessage }) {
       const container = chatContainerRef.current;
       const previousScrollHeight = container.scrollHeight,
         previousScrollTop = container.scrollTop;
+      console.log(receivedMessage);
+      let addedMessage = { ...receivedMessage };
+      if (receivedMessage.u && receivedMessage.u._id) {
+        addedMessage.user = {
+          ...receivedMessage.u,
+        };
+      } else {
+        addedMessage.user = {};
+      }
+      if (receivedMessage.t) {
+        addedMessage.type = receivedMessage.t;
+      } else {
+        addedMessage.type = "normal";
+      }
       setMessages([
         ...messages,
         {
-          from: 1,
+          ...addedMessage,
+          avatarUrl:
+            members.find((member) => member._id === addedMessage.user._id)
+              ?.avatarUrl ?? images.PROFILE,
+          from: addedMessage.user?.username === "ai-general" ? 2 : 1,
           time: new Date(receivedMessage.ts.$date),
           content: receivedMessage.msg,
         },
@@ -205,7 +235,7 @@ function ChatArea({ chatId, chatService, receivedMessage }) {
           </div>
         )}
         {messages.map((item, ind) => (
-          <Message key={ind} message={item} />
+          <Message key={ind} message={item} user={item.user} />
         ))}
         {/* Initial loading */}
         {messages.length === 0 && loading && (

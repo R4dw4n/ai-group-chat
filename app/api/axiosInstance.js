@@ -3,11 +3,12 @@ import axios from "axios";
 import { t } from "i18next";
 
 export const HOST = "https://api.45-159-248-44.nip.io";
-export const setTokens = (accessToken, refreshToken, chatToken, username) => {
+export const setTokens = (accessToken, refreshToken, chatToken, username, user) => {
   localStorage.setItem('accessToken', accessToken);
   localStorage.setItem('refreshToken', refreshToken);
   localStorage.setItem('chatToken', chatToken);
   localStorage.setItem('username', username);
+  localStorage.setItem('user', JSON.stringify(user));
 };
 
 export const clearLocalStorage = () => {
@@ -15,6 +16,7 @@ export const clearLocalStorage = () => {
   localStorage.removeItem("refreshToken");
   localStorage.removeItem("chatToken");
   localStorage.removeItem("username");
+  localStorage.removeItem("user");
 }
 
 export const axiosInstance = () => {
@@ -53,7 +55,7 @@ export const axiosInstance = () => {
           const { accessToken, authToken } = response.data;
           console.log("Token Refreshed!");
           // Store new tokens
-          setTokens(accessToken, localStorage.getItem("refreshToken"), authToken, localStorage.getItem("username"));
+          setTokens(accessToken, localStorage.getItem("refreshToken"), authToken, localStorage.getItem("username"), JSON.parse(localStorage.getItem("user")));
           // Update the Authorization header and retry the request
           instance.defaults.headers.Authorization = `Bearer ${accessToken}`;
           originalRequest.headers.Authorization = `Bearer ${accessToken}`;

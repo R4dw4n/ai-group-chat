@@ -1,7 +1,7 @@
 "use client";
 import { images } from "@/app/utilities/assets";
 import Image from "next/image";
-import React, { createContext, useContext } from "react";
+import React, { createContext, useContext, useState } from "react";
 import { useTranslation } from "react-i18next";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -9,6 +9,84 @@ import rehypeHighlight from "rehype-highlight";
 
 // Context to track if we're inside an ordered list
 const OrderedListContext = createContext(false);
+
+// Custom CodeBlock component with copy functionality
+const CodeBlock = ({ children }) => {
+  const { t } = useTranslation();
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    const getTextToCopy = (element) => {
+      if (typeof element === "string") {
+        return element;
+      }
+      if (typeof element === "number") {
+        return element.toString();
+      }
+      if (Array.isArray(element)) {
+        return element.map(getTextToCopy).join("");
+      }
+      if (element && typeof element === "object" && element.props) {
+        return getTextToCopy(element.props.children);
+      }
+      return "";
+    };
+
+    try {
+      // Extract text content from the code element
+      const textToCopy = getTextToCopy(children);
+      
+      await navigator.clipboard.writeText(textToCopy);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
+    } catch (err) {
+      console.error("Failed to copy text: ", err);
+    }
+  };
+
+  return (
+    <div className="relative group">
+      <pre className="bg-gray-800 text-green-400 p-3 rounded-lg overflow-x-auto text-sm font-mono my-2">
+        {children}
+      </pre>
+      <button
+        onClick={handleCopy}
+        className="absolute top-3 end-3 bg-transparent text-navigation-gray hover:text-white px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-1 cursor-pointer"
+        title={copied ? t("copied") : t("copy")}
+      >
+        {copied ? (
+          <>
+            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fillRule="evenodd"
+                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                clipRule="evenodd"
+              />
+            </svg>
+            {t("copied")}
+          </>
+        ) : (
+          <>
+            <svg
+              className="w-3 h-3"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+              />
+            </svg>
+            {t("copy")}
+          </>
+        )}
+      </button>
+    </div>
+  );
+};
 
 const messageTail = {
   0: "-right-1 border-b-dark-gray",
@@ -94,11 +172,7 @@ const MarkdownContent = ({ content }) => {
           },
 
           // Customize pre/code block styles
-          pre: ({ children }) => (
-            <pre className="bg-gray-800 text-green-400 p-3 rounded-lg overflow-x-auto text-sm font-mono my-2">
-              {children}
-            </pre>
-          ),
+          pre: ({ children }) => <CodeBlock>{children}</CodeBlock>,
 
           // Customize list styles
           ul: ({ children }) => (
@@ -188,6 +262,7 @@ function Message({ message, user }) {
     ul: t("left"),
     ru: t("removed"),
     r: t("group_renamed"),
+    room_changed_avatar: t("room_changed_avatar"),
   };
   const groupStateMessage = (
     <div

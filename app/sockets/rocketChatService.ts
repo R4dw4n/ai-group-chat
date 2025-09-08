@@ -26,6 +26,34 @@ interface RocketChatMessage {
   session?: string;
 }
 
+interface FileUploadResponse {
+  success: boolean;
+  file?: {
+    _id: string;
+    name: string;
+    type: string;
+    size: number;
+    url: string;
+  };
+  error?: string;
+}
+
+interface ImageMessage {
+  _id: string;
+  rid: string;
+  msg: string;
+  attachments?: Array<{
+    _id: string;
+    name: string;
+    type: string;
+    size: number;
+    url: string;
+    image_url?: string;
+    image_type?: string;
+    image_size?: number;
+  }>;
+}
+
 export class RocketChatService {
   private socket$: WebSocketSubject<RocketChatMessage>;
   private messageStream$ = new Subject<any>();
@@ -34,14 +62,18 @@ export class RocketChatService {
   private url: string;
   private authToken: string;
   private username: string;
-
+  private baseUrl: string; // HTTP base URL for file uploads
+  private userId: string;
   constructor(
     token: string,
     username: string,
+    userId: string,
     serverUrl: string = "wss://45-159-248-44.nip.io/websocket"
   ) {
     this.url = serverUrl;
+    this.baseUrl = serverUrl.replace('wss://', 'https://').replace('/websocket', '');
     this.username = username;
+    this.userId = userId;
     this.updateAuthToken(token);
     this.connect();
   }
@@ -210,6 +242,136 @@ export class RocketChatService {
 
     this.socket$.next(message);
     return messageId; // Return the ID to track responses
+  }
+
+  /**
+   * Upload a file to Rocket.Chat server
+   * @param file - The file to upload
+   * @param roomId - The room ID where the file will be sent
+   * @returns Promise with upload response
+   */
+  public async uploadFile(file: File, roomId: string): Promise<FileUploadResponse> {
+    try {
+      // Validate file type and size
+      if (!this.validateFile(file)) {
+        return {
+          success: false,
+          error: 'Invalid file type or size. Only images up to 10MB are allowed.'
+        };
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('msg', '');
+      formData.append('type', 'image');
+
+      const response = await fetch(`${this.baseUrl}/api/v1/rooms.media/${roomId}`, {
+        method: 'POST',
+        headers: {
+          'X-Auth-Token': this.authToken,
+          'X-User-Id': this.userId,
+        },
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        return {
+          success: true,
+          file: {
+            _id: result.file._id,
+            name: result.file.name,
+            type: result.file.type,
+            size: result.file.size,
+            url: result.file.url,
+          },
+        };
+      } else {
+        return {
+          success: false,
+          error: result.error || 'Upload failed',
+        };
+      }
+    } catch (error) {
+      console.error('File upload error:', error);
+      return {
+        success: false,
+        error: 'Network error during upload',
+      };
+    }
+  }
+
+  /**
+   * Send an image message to a room
+   * @param roomId - The room ID
+   * @param file - The image file to send
+   * @param caption - Optional caption for the image
+   * @returns Promise with message ID
+   */
+  public async sendImage(roomId: string, file: File, caption: string = ''): Promise<string> {
+    try {
+      // First upload the file
+      const uploadResult = await this.uploadFile(file, roomId);
+      
+      if (!uploadResult.success) {
+        throw new Error(uploadResult.error || 'Upload failed');
+      }
+
+      // Then send the message with the uploaded file as attachment
+      const messageId = (++this.messageId).toString();
+      const imageMessage: RocketChatMessage = {
+        msg: "method",
+        method: "sendMessage",
+        id: messageId,
+        params: [
+          {
+            _id: this.generateRandomId(),
+            rid: roomId,
+            msg: caption || '', // Caption or empty string
+            attachments: [
+              {
+                _id: uploadResult.file._id,
+                name: uploadResult.file.name,
+                type: uploadResult.file.type,
+                size: uploadResult.file.size,
+                url: uploadResult.file.url,
+                image_url: uploadResult.file.url,
+                image_type: uploadResult.file.type,
+                image_size: uploadResult.file.size,
+              }
+            ],
+          } as ImageMessage,
+        ],
+      };
+
+      this.socket$.next(imageMessage);
+      return messageId;
+    } catch (error) {
+      console.error('Send image error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Validate file before upload
+   * @param file - The file to validate
+   * @returns boolean indicating if file is valid
+   */
+  private validateFile(file: File): boolean {
+    // Check file type (only images)
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      return false;
+    }
+
+    // Check file size (max 10MB)
+    const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+    if (file.size > maxSize) {
+      return false;
+    }
+
+    return true;
   }
 
   private generateRandomId(): string {

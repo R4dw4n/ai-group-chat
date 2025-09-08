@@ -45,7 +45,7 @@ function Features() {
   const ref = useRef();
   const isInView = useInView(ref);
   return (
-    <div id="Features" className="w-5xl m-auto mt-2" ref={ref}>
+    <div id="Features" className="w-5xl m-auto mt-2 overflow-x-hidden" ref={ref}>
       <motion.h1
         variants={h1Variants}
         initial="initial"

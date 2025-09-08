@@ -1,8 +1,8 @@
 "use client";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 
-function ChatInput({ text, setText, textareaHeight, setTextareaHeight, maxHeight, inputRef }) {
+function ChatInput({ text, setText, textareaHeight, setTextareaHeight, maxHeight, inputRef, sendMessage }) {
   const { t } = useTranslation();
   const handleInput = (event) => {
     setText(event.target.value);
@@ -11,7 +11,17 @@ function ChatInput({ text, setText, textareaHeight, setTextareaHeight, maxHeight
     textarea.style.height = `${textarea.scrollHeight}px`; // Set height to scrollHeight
     setTextareaHeight(textarea.scrollHeight);
   };
-  console.log("height: ", textareaHeight)
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault(); // Prevent default new line behavior
+      if (text.trim()) { // Only send if there's actual content
+        sendMessage();
+      }
+    }
+    // Shift+Enter will allow default behavior (new line)
+  };
+
   return (
     <textarea
       ref={inputRef}
@@ -20,6 +30,7 @@ function ChatInput({ text, setText, textareaHeight, setTextareaHeight, maxHeight
       value={text}
       rows={1}
       onInput={handleInput}
+      onKeyDown={handleKeyDown}
       style={{
         maxHeight: `${maxHeight}px`,
         overflow: textareaHeight >= maxHeight ? "auto": "hidden"

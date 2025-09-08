@@ -38,19 +38,20 @@ function ChatArea({
   };
 
   const sendMessage = () => {
+    if (message.trim() === "") return;
     setMessages([
       ...messages,
       {
         from: 0,
         time: new Date(),
-        content: message,
+        content: message.trim(),
         user: {
           name: localStorage.getItem("username"),
         },
         type: "normal",
       },
     ]);
-    chatService.sendMessage(chatId, message);
+    chatService.sendMessage(chatId, message.trim());
     setMessage("");
     ref.current.style.height = "auto";
     setTextareaHeight(40); // Reset textarea height after sending
@@ -255,6 +256,7 @@ function ChatArea({
           textareaHeight={textareaHeight}
           setTextareaHeight={setTextareaHeight}
           maxHeight={maxTextareaHeight} // Pass maxHeight to ChatInput
+          sendMessage={sendMessage}
         />
         <Image
           className="h-5 w-5 cursor-pointer hover:text-white mt-3"

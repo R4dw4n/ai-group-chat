@@ -7,11 +7,12 @@ const useChatConnect = () => {
   useEffect(() => {
     const authToken = localStorage?.getItem("chatToken");
     const username = localStorage?.getItem("username");
+    const user = JSON.parse(localStorage?.getItem("user"));
     if (!authToken) {
       console.error("No auth token available");
       return;
     }
-    const rocketChatService = new RocketChatService(authToken, username);
+    const rocketChatService = new RocketChatService(authToken, username, user.id);
     setChatService(rocketChatService);
     const connectionSub = rocketChatService
       .isConnected()

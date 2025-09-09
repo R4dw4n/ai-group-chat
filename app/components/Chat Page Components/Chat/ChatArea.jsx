@@ -6,6 +6,8 @@ import { icons, images } from "@/app/utilities/assets";
 import Message from "./Message";
 import { groupsService } from "@/app/api/services/groupsService";
 import { messages as messagesF } from "@/app/utilities/messages";
+import { Upload } from "antd";
+import { PaperClipOutlined } from "@ant-design/icons";
 function ChatArea({
   chatId,
   chatService,
@@ -15,6 +17,7 @@ function ChatArea({
 }) {
   const ref = useRef(null);
   const chatContainerRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -59,12 +62,68 @@ function ChatArea({
       if (chatContainerRef.current) {
         chatContainerRef.current.scrollTop =
           chatContainerRef.current.scrollHeight;
-        console.log(
-          chatContainerRef.current.scrollTop,
-          chatContainerRef.current.scrollHeight
-        );
       }
     }, 10);
+  };
+
+  const handleFileUpload = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Check file type
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+
+    if (!allowedTypes.includes(file.type)) {
+      messagesF("error", "File type not supported", 2);
+      return;
+    }
+
+    try {
+      // Send file via chat service
+      await chatService.sendImage(chatId, file);
+
+      // Update the temporary message to show success
+      setMessages((prev) => [
+        ...prev,
+        {
+          from: 0,
+          time: new Date(),
+          content: `Uploading ${file.name}...`,
+          user: {
+            name: localStorage.getItem("username"),
+          },
+          type: "image",
+          attachments: [
+            {
+              name: file.name,
+              size: file.size,
+              type: file.type,
+              url: URL.createObjectURL(file),
+            },
+          ],
+        },
+      ]);
+      console.log(file, 'fileeeee')
+
+      // Clear the file input
+      event.target.value = "";
+      ref.current.style.height = "auto";
+      setTextareaHeight(40); // Reset textarea height after sending
+      // Scroll to bottom
+      setTimeout(() => {
+        if (chatContainerRef.current) {
+          chatContainerRef.current.scrollTop =
+            chatContainerRef.current.scrollHeight;
+        }
+      }, 10);
+    } catch (error) {
+      console.error("File upload error:", error);
+      messagesF("error", "Failed to upload file", 2);
+    }
   };
 
   // Load initial messages
@@ -82,7 +141,12 @@ function ChatArea({
               return {
                 ...msg,
                 content: msg.message,
-                from: msg.sender === username ? 0 : msg.sender === "ai-general" ? 2 : 1,
+                from:
+                  msg.sender === username
+                    ? 0
+                    : msg.sender === "ai-general"
+                    ? 2
+                    : 1,
                 time: msg.timestamp,
               };
             })
@@ -118,7 +182,8 @@ function ChatArea({
           return {
             ...msg,
             content: msg.message,
-            from: msg.sender === username ? 0 : msg.sender === "ai-general" ? 2 : 1,
+            from:
+              msg.sender === username ? 0 : msg.sender === "ai-general" ? 2 : 1,
             time: msg.timestamp,
           };
         });
@@ -218,7 +283,7 @@ function ChatArea({
       {/* Adjust the height of this div dynamically */}
       <div
         ref={chatContainerRef}
-        className="w-full flex flex-col gap-2 overflow-y-auto overflow-x-hidden"
+        className="w-full flex flex-col gap-2 overflow-y-auto overflow-x-hidden px-4"
         style={{
           height: `calc(100vh - 120px - ${Math.min(
             textareaHeight,
@@ -248,7 +313,7 @@ function ChatArea({
           </div>
         )}
       </div>
-      <div className="flex gap-4 px-4 py-2 bg-dark-gray rounded-4xl mt-2">
+      <div className="flex gap-3 px-4 py-2 bg-dark-gray rounded-4xl mt-2 text-navigation-gray">
         <ChatInput
           inputRef={ref}
           setText={setMessage}
@@ -258,8 +323,20 @@ function ChatArea({
           maxHeight={maxTextareaHeight} // Pass maxHeight to ChatInput
           sendMessage={sendMessage}
         />
+        <input
+          ref={fileInputRef}
+          type="file"
+          className="hidden"
+          onChange={handleFileChange}
+          accept="image/*"
+        />
+        <PaperClipOutlined
+          className="h-8 w-8 cursor-pointer text-navigation-gray hover:text-white mt-[5px]"
+          onClick={handleFileUpload}
+          style={{fontSize: "22px"}}
+        />
         <Image
-          className="h-5 w-5 cursor-pointer hover:text-white mt-3"
+          className="h-5 w-5 cursor-pointer hover:text-white mt-3 me-2"
           alt="send"
           src={icons.SEND}
           onClick={sendMessage}

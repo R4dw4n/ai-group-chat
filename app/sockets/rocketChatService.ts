@@ -310,6 +310,7 @@ export class RocketChatService {
    * @returns Promise with message ID
    */
   public async sendImage(roomId: string, file: File, caption: string = ''): Promise<string> {
+    return null;
     try {
       // First upload the file
       const uploadResult = await this.uploadFile(file, roomId);
@@ -366,10 +367,10 @@ export class RocketChatService {
     }
 
     // Check file size (max 10MB)
-    const maxSize = 10 * 1024 * 1024; // 10MB in bytes
-    if (file.size > maxSize) {
-      return false;
-    }
+    // const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+    // if (file.size > maxSize) {
+    //   return false;
+    // }
 
     return true;
   }

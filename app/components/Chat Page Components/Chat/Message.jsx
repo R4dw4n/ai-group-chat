@@ -1,11 +1,12 @@
 "use client";
 import { images } from "@/app/utilities/assets";
 import Image from "next/image";
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
+import { Image as AntdImage } from "antd";
 
 // Context to track if we're inside an ordered list
 const OrderedListContext = createContext(false);
@@ -35,7 +36,7 @@ const CodeBlock = ({ children }) => {
     try {
       // Extract text content from the code element
       const textToCopy = getTextToCopy(children);
-      
+
       await navigator.clipboard.writeText(textToCopy);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
@@ -90,13 +91,17 @@ const CodeBlock = ({ children }) => {
 
 const messageTail = {
   0: "-right-1 border-b-dark-gray",
-  1: "-left-1 border-b-gray",
+  1: "-left-1 border-b-[#191929]",
   2: "hidden",
 };
 const messageStyle = {
-  0: "bg-dark-gray max-w-42",
-  1: "bg-gray max-w-42",
+  0: "bg-dark-gray",
+  1: "bg-[#191929]",
   2: "bg-[#0D1117] max-w-[90%]",
+};
+const messageWidth = {
+  normal: "max-w-42",
+  image: "max-w-full",
 };
 const messageDirection = {
   0: "self-end",
@@ -106,7 +111,7 @@ const messageDirection = {
 };
 const timeStyle = {
   0: "text-gray",
-  1: "text-dark-gray/75",
+  1: "text-gray",
   2: "text-gray",
 };
 const formatTime = (timestamp) => {
@@ -256,6 +261,11 @@ const MarkdownContent = ({ content }) => {
 };
 
 function Message({ message, user }) {
+  useEffect(() => {
+    if (message.type === "image") {
+      console.log(message);
+    }
+  }, []);
   const { t } = useTranslation();
   const actionMessage = {
     au: t("joined"),
@@ -266,9 +276,7 @@ function Message({ message, user }) {
   };
   const groupStateMessage = (
     <div
-      className={`min-w-18 relative text-white text-xs py-1 px-2 rounded-full ${
-        messageStyle[message.from]
-      }`}
+      className={`min-w-18 relative text-white text-xs py-1 px-2 rounded-full bg-dark-gray`}
     >
       <div className="flex items-center gap-2">
         <h5 className="text-white max-w-full break-words">
@@ -283,8 +291,8 @@ function Message({ message, user }) {
 
   const normalMessage = (
     <>
-      <div className="flex overflow-hidden w-12 h-12 rounded-full">
-        {message.from !== 0 && (
+      {message.from !== 0 && (
+        <div className="flex overflow-hidden w-12 h-12 rounded-full">
           <Image
             alt="profile-pic"
             src={user.avatarUrl ?? images.PROFILE}
@@ -292,11 +300,11 @@ function Message({ message, user }) {
             height={48}
             unoptimized={!user?.avatarUrl?.includes("etag")}
           />
-        )}
-      </div>
+        </div>
+      )}
       <div
         className={`min-w-32 relative text-white py-2 px-3 rounded-3xl ${
-          messageStyle[message.from]
+          messageStyle[message.from] + " " + messageWidth[message.type]
         }`}
       >
         <div
@@ -309,9 +317,20 @@ function Message({ message, user }) {
             {user.name}
           </h1>
         )}
-        <div className="text-white max-w-full break-words">
-          <MarkdownContent content={message?.content} />
-        </div>
+        {message.type === "normal" && (
+          <div className="text-white max-w-full break-words">
+            <MarkdownContent content={message?.content} />
+          </div>
+        )}
+        {message.type === "image" && (
+          <div className="text-white max-w-full break-words">
+            <AntdImage
+              src={message?.attachments[0]?.url}
+              alt="image"
+              width={400}
+            />
+          </div>
+        )}
         <h5 className={`${timeStyle[message.from]}`}>
           {formatTime(message?.time)}
         </h5>
@@ -322,10 +341,16 @@ function Message({ message, user }) {
   return (
     <div
       className={`min-w-36 my-2 flex gap-5 ${
-        messageDirection[message.type === "normal" ? message.from : "center"]
+        messageDirection[
+          message.type === "normal" || message.type === "image"
+            ? message.from
+            : "center"
+        ]
       }`}
     >
-      {message.type === "normal" ? normalMessage : groupStateMessage}
+      {message.type === "normal" || message.type === "image"
+        ? normalMessage
+        : groupStateMessage}
     </div>
   );
 }

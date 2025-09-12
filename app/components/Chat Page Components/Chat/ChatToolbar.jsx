@@ -4,10 +4,11 @@ import { ConfigProvider, Form, Modal, theme } from "antd";
 import Image from "next/image";
 import React, { useEffect, useState, useRef } from "react";
 import GroupSettings from "./GroupSettings";
-import { MoreOutlined } from "@ant-design/icons";
+import { DeleteOutlined, LogoutOutlined, MoreOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { messages } from "@/app/utilities/messages";
 import { groupsService } from "@/app/api/services/groupsService";
+import { useRouter } from "next/navigation";
 
 const { darkAlgorithm } = theme;
 
@@ -19,6 +20,9 @@ function ChatToolbar({ chatId, group, members, setGroup, setMembers }) {
   const [fileList, setFileList] = useState([]);
   const [addMembersOpen, setAddMembersOpen] = useState(false);
   const groupSettingsRef = useRef();
+  const [moreSettingsOpen, setMoreSettingsOpen] = useState(false);
+  const router = useRouter();
+  const { i18n } = useTranslation();
 
   useEffect(() => {
     if (group.avatarUrl) {
@@ -68,6 +72,21 @@ function ChatToolbar({ chatId, group, members, setGroup, setMembers }) {
     }
   };
 
+  const toggleMoreSettings = () => {
+    setMoreSettingsOpen(!moreSettingsOpen);
+  };
+
+  const deleteGroup = () => {
+    groupsService.delete(chatId);
+    router.push(`/${i18n.language}/chats`);
+    setMoreSettingsOpen(false);
+  };
+  const leaveGroup = () => {
+    groupsService.leave(chatId);
+    router.push(`/${i18n.language}/chats`);
+    setMoreSettingsOpen(false);
+  };
+
   return (
     <>
       <div className="h-16 p-4 w-full bg-dark-gray text-white">
@@ -75,7 +94,7 @@ function ChatToolbar({ chatId, group, members, setGroup, setMembers }) {
           <button className="cursor-pointer" onClick={handleOpenGroupModal}>
             <div className="flex items-center gap-2">
               <div className="overflow-hidden flex rounded-full w-12 h-12">
-                {group?.avatarUrl  && (
+                {group?.avatarUrl && (
                   <Image
                     alt="profile-pic"
                     src={group?.avatarUrl}
@@ -105,9 +124,32 @@ function ChatToolbar({ chatId, group, members, setGroup, setMembers }) {
               <button
                 className="cursor-pointer text-white/50 hover:!text-white hover:bg-white/10 rounded-sm absolute -top-1.5 py-1 px-1.5 flex items-center justify-center"
                 style={{ insetInlineEnd: "32px" }}
+                onClick={toggleMoreSettings}
               >
                 <MoreOutlined className="text-xl font-bolder" />
               </button>
+              {moreSettingsOpen && group.isAdmin && (
+                <div className="absolute top-5 right-0 shadow-md shadow-gray-700 rounded-sm py-2">
+                  <button
+                    className="cursor-pointer text-red-500/50 hover:text-red-500 hover:bg-white/10 rounded-sm py-1 px-1.5 flex items-center justify-center gap-2"
+                    onClick={deleteGroup}
+                  >
+                    <DeleteOutlined className="text-sm font-bolder" />
+                    <span className="text-sm font-bolder">{t("delete_group")}</span>
+                  </button>
+                </div>
+              )}
+              {moreSettingsOpen && !group.isAdmin && (
+                <div className="absolute top-0 right-0">
+                  <button
+                    className="cursor-pointer text-red-500/50 hover:text-red-500 hover:bg-white/10 rounded-sm py-1 px-1.5 flex items-center justify-center gap-2"
+                    onClick={leaveGroup}
+                  >
+                    <LogoutOutlined className="text-sm font-bolder" />
+                    <span className="text-sm font-bolder">{t("leave_group")}</span>
+                  </button>
+                </div>
+              )}
             </div>
           }
           onCancel={handleCancel}

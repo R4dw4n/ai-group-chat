@@ -8,6 +8,7 @@ import { groupsService } from "@/app/api/services/groupsService";
 import { messages as messagesF } from "@/app/utilities/messages";
 import { Upload } from "antd";
 import { PaperClipOutlined } from "@ant-design/icons";
+import { getUser } from "@/app/utilities/tokenManager";
 function ChatArea({
   chatId,
   chatService,
@@ -49,7 +50,7 @@ function ChatArea({
         time: new Date(),
         content: message.trim(),
         user: {
-          name: localStorage.getItem("username"),
+          name: getUser()?.name,
         },
         type: "normal",
       },
@@ -85,6 +86,7 @@ function ChatArea({
     try {
       // Send file via chat service
       await chatService.sendImage(chatId, file);
+      console.log(file, "file");
 
       // Update the temporary message to show success
       setMessages((prev) => [
@@ -92,9 +94,9 @@ function ChatArea({
         {
           from: 0,
           time: new Date(),
-          content: `Uploading ${file.name}...`,
+          content: ``,
           user: {
-            name: localStorage.getItem("username"),
+            name: getUser()?.name,
           },
           type: "image",
           attachments: [
@@ -103,6 +105,7 @@ function ChatArea({
               size: file.size,
               type: file.type,
               url: URL.createObjectURL(file),
+              image_url: URL.createObjectURL(file),
             },
           ],
         },
@@ -137,6 +140,17 @@ function ChatArea({
         setMessages(
           result.data
             .map((msg) => {
+              if (msg.attachments && msg.attachments.length > 0) {
+                msg.type = "image";
+                msg.attachments = msg.attachments.map((attachment) => {
+                  return {
+                    ...attachment,
+                    url: "https://45-159-248-44.nip.io" + attachment.image_url,
+                    image_url:
+                      "https://45-159-248-44.nip.io" + attachment.image_url,
+                  };
+                });
+              }
               return {
                 ...msg,
                 content: msg.message,
@@ -178,6 +192,17 @@ function ChatArea({
 
       setMessages((prev) => {
         let res = newMessages.map((msg) => {
+          if (msg.attachments && msg.attachments.length > 0) {
+            msg.type = "image";
+            msg.attachments = msg.attachments.map((attachment) => {
+              return {
+                ...attachment,
+                url: "https://45-159-248-44.nip.io" + attachment.image_url,
+                image_url:
+                  "https://45-159-248-44.nip.io" + attachment.image_url,
+              };
+            });
+          }
           return {
             ...msg,
             content: msg.message,
@@ -255,13 +280,29 @@ function ChatArea({
       } else {
         addedMessage.type = "normal";
       }
+      addedMessage.user.avatarUrl = members.find(
+        (member) => member._id === addedMessage.user._id
+      )?.avatarUrl;
+
+      if (
+        receivedMessage.attachments &&
+        receivedMessage.attachments.length > 0
+      ) {
+        addedMessage.attachments = receivedMessage.attachments.map(
+          (attachment) => {
+            return {
+              ...attachment,
+              url: "https://45-159-248-44.nip.io" + attachment.image_url,
+              image_url: "https://45-159-248-44.nip.io" + attachment.image_url,
+            };
+          });
+        addedMessage.type = "image";
+      }
+
       setMessages([
         ...messages,
         {
           ...addedMessage,
-          avatarUrl:
-            members.find((member) => member._id === addedMessage.user._id)
-              ?.avatarUrl ?? images.PROFILE,
           from: addedMessage.user?.username === "ai-general" ? 2 : 1,
           time: new Date(receivedMessage.ts.$date),
           content: receivedMessage.msg,
@@ -330,7 +371,7 @@ function ChatArea({
         <PaperClipOutlined
           className="h-8 w-8 cursor-pointer text-navigation-gray hover:text-white mt-[5px]"
           onClick={handleFileUpload}
-          style={{fontSize: "22px"}}
+          style={{ fontSize: "22px" }}
         />
         <Image
           className="h-5 w-5 cursor-pointer hover:text-white mt-3 me-2"

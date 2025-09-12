@@ -287,6 +287,8 @@ function Message({ message, user }) {
   const normalMessage = (
     <>
       {message.from !== 0 && (
+        <div className="w-12">
+
         <div className="flex overflow-hidden w-12 h-12 rounded-full">
           <Image
             alt="profile-pic"
@@ -294,8 +296,9 @@ function Message({ message, user }) {
             width={48}
             height={48}
             unoptimized={!user?.avatarUrl?.includes("etag")}
-          />
+            />
         </div>
+            </div>
       )}
       <div
         className={`min-w-32 relative text-white py-2 px-3 rounded-3xl ${
@@ -312,18 +315,18 @@ function Message({ message, user }) {
             {user.name}
           </h1>
         )}
-        {message.type === "normal" && (
-          <div className="text-white max-w-full break-words">
-            <MarkdownContent content={message?.content} />
-          </div>
-        )}
-        {message.type === "image" && (
+        {message.type === "image" && message.attachments && message.attachments.length > 0 && (
           <div className="text-white max-w-full break-words">
             <AntdImage
-              src={message?.attachments[0]?.url}
+              src={message?.attachments[0]?.url ?? message?.attachments[0]?.image_url}
               alt="image"
               width={400}
             />
+          </div>
+        )}
+        {message.content && message.type !== "image" && (
+          <div className="text-white max-w-full break-words">
+            <MarkdownContent content={message?.content} />
           </div>
         )}
         <h5 className={`${timeStyle[message.from]}`}>

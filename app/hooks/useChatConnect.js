@@ -17,7 +17,6 @@ const useChatConnect = () => {
     const connectionSub = rocketChatService
       .isConnected()
       .subscribe((_connected) => {
-        console.log("subscribing to isConnected", _connected);
         setConnected(_connected);
       });
     return () => {

@@ -5,9 +5,10 @@ import React, { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import PrimaryButton from "../PrimaryButton";
 import useTypewriter from "../../hooks/useTypewriter";
+import Link from "next/link";
 
 function Hero() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const {
     currentText: header1,
     showCursor: showCursor1,
@@ -64,10 +65,11 @@ function Hero() {
           }`}
         ></span>
       </p>
-
-      <PrimaryButton width="w-xl" height="h-14">
-        {t("get_started")}
-      </PrimaryButton>
+      <Link href={`/${i18n.language}/chats`}>
+        <PrimaryButton width="w-xl" height="h-14">
+          {t("get_started")}
+        </PrimaryButton>
+      </Link>
     </div>
   );
 }

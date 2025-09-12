@@ -5,10 +5,26 @@ const defaultLocale = 'en'; // Default language
 
 export function middleware(request) {
   const pathname = request.nextUrl.pathname;
-  
+
   // Extract the locale from the URL (e.g., /ar/about -> 'ar')
   const locale = pathname.split('/')[1];
-  
+
+  // Check if the path is a protected route (chats)
+  const isProtectedRoute = pathname.includes('/chats');
+
+  // If accessing a protected route, check for authentication
+  if (isProtectedRoute) {
+    const accessToken = request.cookies.get('accessToken')?.value;
+
+    // If no access token found, redirect to login
+    if (!accessToken) {
+      const currentLocale = supportedLocales.includes(locale) ? locale : getPreferredLocale(request);
+      return NextResponse.redirect(
+        new URL(`/${currentLocale}/login`, request.url)
+      );
+    }
+  }
+
   // If the locale is supported, set it in a cookie
   if (supportedLocales.includes(locale)) {
     const response = NextResponse.next();

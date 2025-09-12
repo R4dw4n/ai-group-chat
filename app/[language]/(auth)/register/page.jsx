@@ -115,9 +115,6 @@ function Page() {
       setLoading(false);
     }
   };
-  useEffect(() => {
-    console.log(loading);
-  }, [loading]);
   return (
     <>
       <div className="min-h-[calc(100vh-80px)] min-w-screen pb-20 px-44 bg-background overflow-x-hidden">

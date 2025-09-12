@@ -1,28 +1,17 @@
 import { message } from "antd";
 import axios from "axios";
 import { t } from "i18next";
+import { setTokens, clearTokens, getAccessToken, getRefreshToken, getUsername, getUser } from "../utilities/tokenManager";
 
 export const HOST = "https://api.45-159-248-44.nip.io";
-export const setTokens = (accessToken, refreshToken, chatToken, username, user) => {
-  localStorage.setItem('accessToken', accessToken);
-  localStorage.setItem('refreshToken', refreshToken);
-  localStorage.setItem('chatToken', chatToken);
-  localStorage.setItem('username', username);
-  localStorage.setItem('user', JSON.stringify(user));
-};
 
-export const clearLocalStorage = () => {
-  localStorage.removeItem("accessToken");
-  localStorage.removeItem("refreshToken");
-  localStorage.removeItem("chatToken");
-  localStorage.removeItem("username");
-  localStorage.removeItem("user");
-}
+// Export the token management functions
+export { setTokens, clearTokens };
 
 export const axiosInstance = () => {
   const header = {
     Accept: "application/json",
-    Authorization: "Bearer " + localStorage.getItem("accessToken"),
+    Authorization: "Bearer " + getAccessToken(),
   };
   const instance = axios.create({
     baseURL: HOST,
@@ -49,13 +38,13 @@ export const axiosInstance = () => {
           const response = await axios.post(HOST + "/auth/refresh", {
             headers: {
               Accept: "application/json",
-              Authorization: "Bearer " + localStorage.getItem("refreshToken"),
+              Authorization: "Bearer " + getRefreshToken(),
             },
           });
           const { accessToken, authToken } = response.data;
           console.log("Token Refreshed!");
           // Store new tokens
-          setTokens(accessToken, localStorage.getItem("refreshToken"), authToken, localStorage.getItem("username"), JSON.parse(localStorage.getItem("user")));
+          setTokens(accessToken, getRefreshToken(), authToken, getUsername(), getUser());
           // Update the Authorization header and retry the request
           instance.defaults.headers.Authorization = `Bearer ${accessToken}`;
           originalRequest.headers.Authorization = `Bearer ${accessToken}`;
@@ -64,7 +53,7 @@ export const axiosInstance = () => {
           // If refresh token is also expired or invalid, log the user out
           // Handle logout here (e.g., redirect to login, clear storage)
           console.log("Refresh of token failed", err);
-          clearLocalStorage();
+          clearTokens();
           window.location.href = "/login";
         }
         // Redirect to login page or display error message

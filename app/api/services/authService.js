@@ -10,13 +10,4 @@ export const authService = {
   logout: async () => {
     return await axiosInstance().post("/auth/logout")
   },
-  getCurrentUser: async () => {
-    return await axiosInstance().get("/auth/me")
-  },
-  updateProfile: async (data) => {
-    return await axiosInstance().put("/auth/profile", data)
-  },
-  changePassword: async (data) => {
-    return await axiosInstance().put("/auth/change-password", data)
-  },
 }

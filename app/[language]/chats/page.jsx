@@ -25,24 +25,26 @@ function Page() {
   const { connected, chatService } = useChatConnect();
   const [receivedMessage, setReceivedMessage] = useState(null);
 
-  useEffect(() => {
-    const getGroups = async () => {
-      let res;
-      try {
-        res = await groupsService.getAll({});
-        setGroups(res.data);
+  const getGroups = async () => {
+    let res;
+    try {
+      res = await groupsService.getAll({});
+      setGroups(res.data);
+      if (initialGroups.length === 0) {
         setInitialGroups(res.data);
-      } catch (error) {
-        messages("error", error.response.data.message);
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (error) {
+      messages("error", error.response.data.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     getGroups();
   }, []);
 
   useEffect(() => {
-    console.log("here", connected);
     if (chatService === null || initialGroups.length === 0 || !connected)
       return () => {};
     // Subscribe to a room after authentication
@@ -113,6 +115,7 @@ function Page() {
                 setOpenModal={setOpenModal}
                 chatService={chatService}
                 subscribeToGroup={subscribeToGroup}
+                getGroups={getGroups}
               />
             </Modal>
           </ConfigProvider>
@@ -132,7 +135,7 @@ function Page() {
 
 export default Page;
 
-const CreateGroupModal = ({ form, setOpenModal, chatService, subscribeToGroup }) => {
+const CreateGroupModal = ({ form, setOpenModal, chatService, subscribeToGroup, getGroups }) => {
   const { i18n } = useTranslation();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -142,7 +145,7 @@ const CreateGroupModal = ({ form, setOpenModal, chatService, subscribeToGroup })
   const [fileList, setFileList] = useState([]);
 
   const handleSelectChange = (value, option) => {
-    console.log(value, option);
+    // console.log(value, option);
   };
   const handleSearch = async (value) => {
     try {
@@ -164,16 +167,15 @@ const CreateGroupModal = ({ form, setOpenModal, chatService, subscribeToGroup })
     try {
       setLoading(true);
       res = await groupsService.create({ name: values.name });
-      subscription = subscribeToGroup({...res.data, id: res.data._id });
       const addMembersRes = await groupsService.addUsers(res.data._id, {
         userIds: [...values.members],
       });
+      subscription = subscribeToGroup({...res.data, id: res.data._id });
       if (fileList.length > 0) {
         const avatarRes = await groupsService.addAvatar(res.data._id, {
           image: fileList[0].originFileObj,
         });
       }
-      // FIX MESSAGE FUNCTIONS AND MOVE THE WEBSOCKET CONNECTION LOGIC TO THIS PAGE INSTEAD OF CHAT AREA
       messages("success", t("success"), 2);
       setOpenModal(false);
       router.push(`/${i18n.language}/chats?chatId=${res.data._id}`);
@@ -188,6 +190,7 @@ const CreateGroupModal = ({ form, setOpenModal, chatService, subscribeToGroup })
       }
     } finally {
       setLoading(false);
+      getGroups();
     }
   };
   return (

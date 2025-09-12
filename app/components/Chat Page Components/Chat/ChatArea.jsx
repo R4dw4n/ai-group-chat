@@ -107,7 +107,6 @@ function ChatArea({
           ],
         },
       ]);
-      console.log(file, 'fileeeee')
 
       // Clear the file input
       event.target.value = "";
@@ -195,7 +194,6 @@ function ChatArea({
       setTimeout(() => {
         const newScrollHeight = container.scrollHeight;
         const scrollDiff = newScrollHeight - previousScrollHeight;
-        console.log(previousScrollHeight, newScrollHeight, container.scrollTop);
         container.scrollTop += scrollDiff - 64;
       }, 10);
     } catch (error) {
@@ -244,7 +242,6 @@ function ChatArea({
       const container = chatContainerRef.current;
       const previousScrollHeight = container.scrollHeight,
         previousScrollTop = container.scrollTop;
-      console.log(receivedMessage);
       let addedMessage = { ...receivedMessage };
       if (receivedMessage.u && receivedMessage.u._id) {
         addedMessage.user = {

@@ -160,7 +160,6 @@ export class RocketChatService {
 
   public subscribeToRoom(roomId: string): Observable<any> {
     const subId = (++this.messageId).toString();
-
     // Subscribe to the room's stream
     this.socket$.next({
       msg: "sub",
@@ -192,10 +191,6 @@ export class RocketChatService {
   private handleMessage(msg: RocketChatMessage) {
     switch (msg.msg) {
       case "connected":
-        console.log(
-          "Successfully connected to Rocket.Chat with session:",
-          msg.session
-        );
         this.isConnected$.next(true);
         // If we have an auth token, authenticate now
         if (this.authToken) {

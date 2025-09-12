@@ -13,7 +13,7 @@ export const metadata = {
 export default async function RootLayout({ children }) {
   const locale = (await cookies()).get("NEXT_LOCALE")?.value;
   // const locale = pathname?.split('/')[3];
-  console.log("locale: ", locale)
+  // console.log("locale: ", locale)
   return (
     <html lang="en" className="font-cairo" dir={locale === "ar" ? "rtl" : "ltr"}>
       <body style={{ overflowX: "hidden" }}>

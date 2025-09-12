@@ -261,11 +261,6 @@ const MarkdownContent = ({ content }) => {
 };
 
 function Message({ message, user }) {
-  useEffect(() => {
-    if (message.type === "image") {
-      console.log(message);
-    }
-  }, []);
   const { t } = useTranslation();
   const actionMessage = {
     au: t("joined"),

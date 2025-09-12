@@ -126,7 +126,7 @@ function Contact() {
         </motion.div>
         <motion.form
           ref={formRef}
-          onSubmit={() => console.log("Submitted Successfully!")}
+          onSubmit={() => console.log("demo")}
           className="flex flex-col gap-4"
           variants={formVariants}
           initial="initial"

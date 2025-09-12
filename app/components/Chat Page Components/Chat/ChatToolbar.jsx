@@ -50,13 +50,11 @@ function ChatToolbar({ chatId, group, members, setGroup, setMembers }) {
       setLoading(true);
       if (group.name !== values.name) {
         const res = await groupsService.rename(chatId, { name: values.name });
-        console.log("res", res);
         setGroup({ ...group, name: res.data.name });
       }
       if (values.members.length > 0) {
         await groupsService.addUsers(chatId, { userIds: [...values.members] });
         const res = await groupsService.getMembers(chatId);
-        console.log("res 2", res);
         setMembers([...res.data]);
       }
       setOpenGroupModal(false);
@@ -69,17 +67,6 @@ function ChatToolbar({ chatId, group, members, setGroup, setMembers }) {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    console.log(
-      "openGroupModal",
-      openGroupModal,
-      "addMembersOpen",
-      addMembersOpen,
-      "editMode",
-      editMode
-    );
-  }, [openGroupModal, addMembersOpen, editMode]);
 
   return (
     <>

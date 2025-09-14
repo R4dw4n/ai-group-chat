@@ -48,5 +48,10 @@ export const groupsService = {
         ...params
       }
     })
+  },
+  leave: async (id) => {
+    // no endpoint for leaving group
+    return null;
+    return await axiosInstance().get(`/groups/${id}/leave`)
   }
 }

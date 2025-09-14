@@ -85,10 +85,6 @@ function ChatArea({
 
     try {
       // Send file via chat service
-      await chatService.sendImage(chatId, file);
-      console.log(file, "file");
-
-      // Update the temporary message to show success
       setMessages((prev) => [
         ...prev,
         {
@@ -110,6 +106,9 @@ function ChatArea({
           ],
         },
       ]);
+      await chatService.sendImage(chatId, file);
+
+      // Update the temporary message to show success
 
       // Clear the file input
       event.target.value = "";

@@ -318,11 +318,9 @@ export class RocketChatService {
     try {
       // First upload the file
       const uploadResult = await this.uploadFile(file, roomId);
-      console.log("11111");
       if (!uploadResult.success) {
         throw new Error(uploadResult.error || "Upload failed");
       }
-      console.log("success");
       // Then send the message with the uploaded file as attachment
       const messageId = (++this.messageId).toString();
       const imageMessage = {
@@ -338,7 +336,6 @@ export class RocketChatService {
           },
         ],
       };
-      console.log(imageMessage, "sending image message");
       const response = await fetch(`${this.baseUrl}/api/v1/chat.postMessage`, {
         method: "POST",
         headers: {

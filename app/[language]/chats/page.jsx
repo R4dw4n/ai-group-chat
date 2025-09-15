@@ -109,6 +109,8 @@ function Page() {
               title={t("create_group")}
               onCancel={handleCancel}
               onOk={() => form.submit()}
+              okText={t("ok")}
+              cancelText={t("cancel")}
             >
               <CreateGroupModal
                 form={form}

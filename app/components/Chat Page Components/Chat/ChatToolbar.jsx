@@ -154,6 +154,8 @@ function ChatToolbar({ chatId, group, members, setGroup, setMembers }) {
           }
           onCancel={handleCancel}
           onOk={handleModalOk}
+          okText={t("ok")}
+          cancelText={t("cancel")}
         >
           <GroupSettings
             ref={groupSettingsRef}

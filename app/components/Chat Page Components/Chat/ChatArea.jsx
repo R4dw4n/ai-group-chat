@@ -9,6 +9,7 @@ import { messages as messagesF } from "@/app/utilities/messages";
 import { Upload } from "antd";
 import { PaperClipOutlined } from "@ant-design/icons";
 import { getUser } from "@/app/utilities/tokenManager";
+import { useTranslation } from "react-i18next";
 function ChatArea({
   chatId,
   chatService,
@@ -16,6 +17,7 @@ function ChatArea({
   members,
   setMembers,
 }) {
+  const { t } = useTranslation();
   const ref = useRef(null);
   const chatContainerRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -333,7 +335,7 @@ function ChatArea({
           <div className="flex justify-center py-4">
             <div className="bg-dark-gray text-white px-4 py-2 rounded-full text-sm flex items-center space-x-2">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              <span>Loading more messages...</span>
+              <span>{t("loading_messages")}</span>
             </div>
           </div>
         )}
@@ -345,7 +347,7 @@ function ChatArea({
           <div className="flex justify-center items-center h-64">
             <div className="text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
-              <p className="text-gray">Loading chat messages...</p>
+              <p className="text-gray">{t("loading_messages")}</p>
             </div>
           </div>
         )}

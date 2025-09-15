@@ -64,5 +64,17 @@
   "group_settings": "Group Settings",
   "members": "Members",
   "group_name": "Group Name",
-  "add_members": "Add Members"
+  "add_members": "Add Members",
+  "ok": "OK",
+  "cancel": "Cancel",
+  "delete_group": "Delete Group",
+  "leave_group": "Leave Group",
+  "rename_group": "Rename Group",
+  "loading_messages": "Loading Messages...",
+  "joined": "Joined",
+  "left": "Left",
+  "removed": "Removed",
+  "group_renamed": "Group Renamed",
+  "room_changed_avatar": "Group Changed Avatar",
+  "upload": "Upload"
 }

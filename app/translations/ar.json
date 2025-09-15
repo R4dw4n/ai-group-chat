@@ -64,5 +64,17 @@
   "group_settings": "إعدادات المجموعة",
   "members": "الأعضاء",
   "group_name": "اسم المجموعة",
-  "add_members": "إضافة أعضاء"
+  "add_members": "إضافة أعضاء",
+  "ok": "موافق",
+  "cancel": "إلغاء",
+  "delete_group": "حذف المجموعة",
+  "leave_group": "مغادرة المجموعة",
+  "rename_group": "إعادة تسمية المجموعة",
+  "loading_messages": "جاري تحميل الرسائل...",
+  "joined": "انضم",
+  "left": "غادر",
+  "removed": "إزالة",
+  "group_renamed": "تم تعديل اسم المجموعة",
+  "room_changed_avatar": "تم تعديل صورة المجموعة",
+  "upload": "رفع" 
 }

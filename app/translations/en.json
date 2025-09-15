@@ -76,5 +76,6 @@
   "removed": "Removed",
   "group_renamed": "Group Renamed",
   "room_changed_avatar": "Group Changed Avatar",
-  "upload": "Upload"
+  "upload": "Upload",
+  "sent": "Sent"
 }

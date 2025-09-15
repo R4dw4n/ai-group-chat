@@ -34,10 +34,10 @@ function ChatItem({ chat }) {
       <div className="p-2 hidden @[200px]:block flex-1">
         <div className="flex justify-between items-center">
           <h1 className="text-white @[310px]:text-lg">{chat?.name}</h1>
-          <p className="text-light-gray/50 text-xs @[310px]:text-sm">Sent ✔</p>
+          <p className="text-light-gray/50 text-xs @[310px]:text-sm">{t("sent")} ✔</p>
         </div>
         <p className="hidden @[325px]:inline-block text-light-gray/50 text-ellipsis whitespace-nowrap overflow-hidden w-60">
-          {chat?.lastMessage?.message}
+          {chat?.user?.name} {": "} {chat?.lastMessage?.message}
         </p>
       </div>
     </Link>

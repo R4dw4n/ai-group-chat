@@ -5,7 +5,7 @@ import { messages } from "@/app/utilities/messages";
 import Loading from "@/app/utilities/Loading";
 import { groupsService } from "@/app/api/services/groupsService";
 
-function Chat({ chatId, chatService, receivedMessage }) {
+function Chat({ chatId, chatService, receivedMessage, groups, setGroups }) {
   const [loading, setLoading] = useState(false);
   const [group, setGroup] = useState(null);
   const [members, setMembers] = useState([]);
@@ -56,6 +56,8 @@ function Chat({ chatId, chatService, receivedMessage }) {
                 members={members}
                 setMembers={setMembers}
                 receivedMessage={receivedMessage}
+                groups={groups}
+                setGroups={setGroups}
               />
             </>
           ) : (

@@ -16,6 +16,8 @@ function ChatArea({
   receivedMessage,
   members,
   setMembers,
+  groups,
+  setGroups,
 }) {
   const { t } = useTranslation();
   const ref = useRef(null);
@@ -45,18 +47,23 @@ function ChatArea({
 
   const sendMessage = () => {
     if (message.trim() === "") return;
-    setMessages([
-      ...messages,
-      {
-        from: 0,
-        time: new Date(),
-        content: message.trim(),
-        user: {
-          name: getUser()?.name,
-        },
-        type: "normal",
+    const newMessage = {
+      from: 0,
+      time: new Date(),
+      content: message.trim(),
+      user: {
+        name: getUser()?.name,
       },
-    ]);
+      type: "normal",
+    };
+    setMessages([...messages, newMessage]);
+    setGroups((prevGroups) => {
+      const groupIndex = prevGroups.findIndex((g) => g.id === chatId);
+      if (groupIndex === -1) return prevGroups;
+      let updatedGroups = [...prevGroups];
+      updatedGroups[groupIndex].lastMessage = newMessage;
+      return updatedGroups;
+    });
     chatService.sendMessage(chatId, message.trim());
     setMessage("");
     ref.current.style.height = "auto";
@@ -87,6 +94,24 @@ function ChatArea({
 
     try {
       // Send file via chat service
+      const newMessage = {
+        from: 0,
+        time: new Date(),
+        content: ``,
+        user: {
+          name: getUser()?.name,
+        },
+        type: "image",
+        attachments: [
+          {
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            url: URL.createObjectURL(file),
+            image_url: URL.createObjectURL(file),
+          },
+        ],
+      };
       setMessages((prev) => [
         ...prev,
         {
@@ -108,6 +133,13 @@ function ChatArea({
           ],
         },
       ]);
+      setGroups((prevGroups) => {
+        const groupIndex = prevGroups.findIndex((g) => g.id === chatId);
+        if (groupIndex === -1) return prevGroups;
+        let updatedGroups = [...prevGroups];
+        updatedGroups[groupIndex].lastMessage = newMessage;
+        return updatedGroups;
+      });
       await chatService.sendImage(chatId, file);
 
       // Update the temporary message to show success
@@ -296,19 +328,24 @@ function ChatArea({
               url: "https://45-159-248-44.nip.io" + attachment.image_url,
               image_url: "https://45-159-248-44.nip.io" + attachment.image_url,
             };
-          });
+          }
+        );
         addedMessage.type = "image";
       }
-
-      setMessages([
-        ...messages,
-        {
-          ...addedMessage,
-          from: addedMessage.user?.username === "ai-general" ? 2 : 1,
-          time: new Date(receivedMessage.ts.$date),
-          content: receivedMessage.msg,
-        },
-      ]);
+      const newMessage = {
+        ...addedMessage,
+        from: addedMessage.user?.username === "ai-general" ? 2 : 1,
+        time: new Date(receivedMessage.ts.$date),
+        content: receivedMessage.msg,
+      };
+      setMessages([...messages, newMessage]);
+      setGroups((prevGroups) => {
+        const groupIndex = prevGroups.findIndex((g) => g.id === chatId);
+        if (groupIndex === -1) return prevGroups;
+        let updatedGroups = [...prevGroups];
+        updatedGroups[groupIndex].lastMessage = newMessage;
+        return updatedGroups;
+      });
       setTimeout(() => {
         if (previousScrollHeight === previousScrollTop) {
           container.scrollTop = container.scrollHeight;

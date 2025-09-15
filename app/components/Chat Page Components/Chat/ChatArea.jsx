@@ -61,7 +61,7 @@ function ChatArea({
       const groupIndex = prevGroups.findIndex((g) => g.id === chatId);
       if (groupIndex === -1) return prevGroups;
       let updatedGroups = [...prevGroups];
-      updatedGroups[groupIndex].lastMessage = message;
+      updatedGroups[groupIndex].lastMessage = {...newMessage, message: message.trim()};
       return updatedGroups;
     });
     chatService.sendMessage(chatId, message.trim());
@@ -117,7 +117,7 @@ function ChatArea({
         {
           from: 0,
           time: new Date(),
-          content: ``,
+          content: `Image File`,
           user: {
             name: getUser()?.name,
           },
@@ -137,7 +137,7 @@ function ChatArea({
         const groupIndex = prevGroups.findIndex((g) => g.id === chatId);
         if (groupIndex === -1) return prevGroups;
         let updatedGroups = [...prevGroups];
-        updatedGroups[groupIndex].lastMessage = "Image File";
+        updatedGroups[groupIndex].lastMessage = {...newMessage, message: "Image File"};
         return updatedGroups;
       });
       await chatService.sendImage(chatId, file);
@@ -343,14 +343,14 @@ function ChatArea({
         const groupIndex = prevGroups.findIndex((g) => g.id === chatId);
         if (groupIndex === -1) return prevGroups;
         let updatedGroups = [...prevGroups];
-        updatedGroups[groupIndex].lastMessage = receivedMessage.msg;
+        updatedGroups[groupIndex].lastMessage = {...newMessage, message: receivedMessage.msg};
         return updatedGroups;
       });
       setTimeout(() => {
-        if (previousScrollHeight === previousScrollTop) {
+        if (previousScrollHeight - previousScrollTop <= 785) {
           container.scrollTop = container.scrollHeight;
         }
-      }, 10);
+      }, 50);
     }
   }, [receivedMessage]);
 

@@ -129,7 +129,7 @@ function ChatToolbar({ chatId, group, members, setGroup, setMembers }) {
                 <MoreOutlined className="text-xl font-bolder" />
               </button>
               {moreSettingsOpen && group.isAdmin && (
-                <div className="absolute top-5 right-0 shadow-md shadow-gray-700 rounded-sm py-2">
+                <div className="absolute top-5 right-0 shadow-md shadow-gray rounded-sm py-2">
                   <button
                     className="cursor-pointer text-red-500/50 hover:text-red-500 hover:bg-white/10 rounded-sm py-1 px-1.5 flex items-center justify-center gap-2"
                     onClick={deleteGroup}
@@ -140,7 +140,7 @@ function ChatToolbar({ chatId, group, members, setGroup, setMembers }) {
                 </div>
               )}
               {moreSettingsOpen && !group.isAdmin && (
-                <div className="absolute top-0 right-0">
+                <div className="absolute top-5 right-0 shadow-md shadow-gray rounded-sm py-2">
                   <button
                     className="cursor-pointer text-red-500/50 hover:text-red-500 hover:bg-white/10 rounded-sm py-1 px-1.5 flex items-center justify-center gap-2"
                     onClick={leaveGroup}

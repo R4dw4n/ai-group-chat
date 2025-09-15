@@ -61,7 +61,7 @@ function ChatArea({
       const groupIndex = prevGroups.findIndex((g) => g.id === chatId);
       if (groupIndex === -1) return prevGroups;
       let updatedGroups = [...prevGroups];
-      updatedGroups[groupIndex].lastMessage = newMessage;
+      updatedGroups[groupIndex].lastMessage = message;
       return updatedGroups;
     });
     chatService.sendMessage(chatId, message.trim());
@@ -137,7 +137,7 @@ function ChatArea({
         const groupIndex = prevGroups.findIndex((g) => g.id === chatId);
         if (groupIndex === -1) return prevGroups;
         let updatedGroups = [...prevGroups];
-        updatedGroups[groupIndex].lastMessage = newMessage;
+        updatedGroups[groupIndex].lastMessage = "Image File";
         return updatedGroups;
       });
       await chatService.sendImage(chatId, file);
@@ -343,7 +343,7 @@ function ChatArea({
         const groupIndex = prevGroups.findIndex((g) => g.id === chatId);
         if (groupIndex === -1) return prevGroups;
         let updatedGroups = [...prevGroups];
-        updatedGroups[groupIndex].lastMessage = newMessage;
+        updatedGroups[groupIndex].lastMessage = receivedMessage.msg;
         return updatedGroups;
       });
       setTimeout(() => {

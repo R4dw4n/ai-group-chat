@@ -37,7 +37,7 @@ function ChatItem({ chat }) {
           <p className="text-light-gray/50 text-xs @[310px]:text-sm">{t("sent")} ✔</p>
         </div>
         <p className="hidden @[325px]:inline-block text-light-gray/50 text-ellipsis whitespace-nowrap overflow-hidden w-60">
-          {chat?.user?.name} {": "} {chat?.lastMessage?.message}
+          {chat?.lastMessage?.user?.name} {": "} {chat?.lastMessage?.message}
         </p>
       </div>
     </Link>

@@ -49,6 +49,7 @@ function Chat({ chatId, chatService, receivedMessage, groups, setGroups }) {
                 chatId={chatId}
                 members={members}
                 setMembers={setMembers}
+                setGroups={setGroups}
                 />
               <ChatArea
                 chatId={chatId}

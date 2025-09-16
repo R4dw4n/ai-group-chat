@@ -4,7 +4,11 @@ import { ConfigProvider, Form, Modal, theme } from "antd";
 import Image from "next/image";
 import React, { useEffect, useState, useRef } from "react";
 import GroupSettings from "./GroupSettings";
-import { DeleteOutlined, LogoutOutlined, MoreOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  LogoutOutlined,
+  MoreOutlined,
+} from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { messages } from "@/app/utilities/messages";
 import { groupsService } from "@/app/api/services/groupsService";
@@ -12,7 +16,14 @@ import { useRouter } from "next/navigation";
 
 const { darkAlgorithm } = theme;
 
-function ChatToolbar({ chatId, group, members, setGroup, setMembers }) {
+function ChatToolbar({
+  chatId,
+  group,
+  members,
+  setGroup,
+  setMembers,
+  setGroups,
+}) {
   const { t } = useTranslation();
   const [openGroupModal, setOpenGroupModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -21,8 +32,10 @@ function ChatToolbar({ chatId, group, members, setGroup, setMembers }) {
   const [addMembersOpen, setAddMembersOpen] = useState(false);
   const groupSettingsRef = useRef();
   const [moreSettingsOpen, setMoreSettingsOpen] = useState(false);
+  const [isRemoved, setIsRemoved] = useState(false);
   const router = useRouter();
   const { i18n } = useTranslation();
+  const [initialRender, setInitialRender] = useState(true);
 
   useEffect(() => {
     if (group.avatarUrl) {
@@ -50,25 +63,49 @@ function ChatToolbar({ chatId, group, members, setGroup, setMembers }) {
   };
 
   const handleFormSubmit = async (values) => {
+    let groupName = null,
+      avatar = null;
     try {
       setLoading(true);
       if (group.name !== values.name) {
         const res = await groupsService.rename(chatId, { name: values.name });
-        setGroup({ ...group, name: res.data.name });
+        groupName = res.data.name;
       }
       if (values.members.length > 0) {
         await groupsService.addUsers(chatId, { userIds: [...values.members] });
         const res = await groupsService.getMembers(chatId);
         setMembers([...res.data]);
       }
+      if (isRemoved) {
+        if (fileList.length > 0) {
+          const res = await groupsService.addAvatar(chatId, {
+            image: fileList[0].originFileObj,
+          });
+          avatar = URL.createObjectURL(fileList[0].originFileObj);
+        }
+      }
       setOpenGroupModal(false);
       setAddMembersOpen(false);
       setEditMode(false);
     } catch (error) {
       console.log("error", error);
-      // messages("error", error.response.data.message);
+      messages("error", error.response.data.message);
     } finally {
       setLoading(false);
+      setInitialRender(false);
+      setGroup((prev) => {
+        let newGroup = {};
+        if (groupName !== null) {
+          newGroup.name = groupName;
+        }
+        if (avatar !== null) {
+          newGroup.avatarUrl = avatar;
+        }
+        return {
+          ...prev,
+          ...newGroup,
+        };
+      });
     }
   };
 
@@ -86,6 +123,27 @@ function ChatToolbar({ chatId, group, members, setGroup, setMembers }) {
     router.push(`/${i18n.language}/chats`);
     setMoreSettingsOpen(false);
   };
+
+  useEffect(() => {
+    console.log('rendering', initialRender)
+    if (initialRender) {
+      return;
+    }
+    console.log('here changing groups', group)
+    if (group) {
+      setGroups((prevGroups) => {
+        const groupIndex = prevGroups.findIndex((g) => g.id === chatId);
+        if (groupIndex === -1) return prevGroups;
+        let updatedGroups = [...prevGroups];
+        updatedGroups[groupIndex] = { ...updatedGroups[groupIndex], ...group };
+
+        // Reorder groups to put the group that received the message first
+        const [movedGroup] = updatedGroups.splice(groupIndex, 1);
+        updatedGroups = [movedGroup, ...updatedGroups];
+        return updatedGroups;
+      });
+    }
+  }, [initialRender]);
 
   return (
     <>
@@ -135,7 +193,9 @@ function ChatToolbar({ chatId, group, members, setGroup, setMembers }) {
                     onClick={deleteGroup}
                   >
                     <DeleteOutlined className="text-sm font-bolder" />
-                    <span className="text-sm font-bolder">{t("delete_group")}</span>
+                    <span className="text-sm font-bolder">
+                      {t("delete_group")}
+                    </span>
                   </button>
                 </div>
               )}
@@ -146,7 +206,9 @@ function ChatToolbar({ chatId, group, members, setGroup, setMembers }) {
                     onClick={leaveGroup}
                   >
                     <LogoutOutlined className="text-sm font-bolder" />
-                    <span className="text-sm font-bolder">{t("leave_group")}</span>
+                    <span className="text-sm font-bolder">
+                      {t("leave_group")}
+                    </span>
                   </button>
                 </div>
               )}
@@ -160,7 +222,6 @@ function ChatToolbar({ chatId, group, members, setGroup, setMembers }) {
           <GroupSettings
             ref={groupSettingsRef}
             group={group}
-            setGroup={setGroup}
             members={members}
             editMode={editMode}
             setEditMode={setEditMode}
@@ -169,6 +230,7 @@ function ChatToolbar({ chatId, group, members, setGroup, setMembers }) {
             setAddMembersOpen={setAddMembersOpen}
             fileList={fileList}
             setFileList={setFileList}
+            setIsRemoved={setIsRemoved}
           />
         </Modal>
       </ConfigProvider>

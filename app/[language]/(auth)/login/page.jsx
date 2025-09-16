@@ -4,6 +4,7 @@ import { authService } from "@/app/api/services/authService";
 import PrimaryButton from "@/app/components/PrimaryButton";
 import { icons } from "@/app/utilities/assets";
 import Loading from "@/app/utilities/Loading";
+import { messages } from "@/app/utilities/messages";
 import { message } from "antd";
 import Image from "next/image";
 import Link from "next/link";
@@ -73,13 +74,13 @@ function Page() {
     try {
       setLoading(true);
       const res = await authService.login(model);
-      message.success(t("success"), 2);
+      messages('success', t("success"), 2);
       setTokens(res.data.accessToken, res.data.refreshToken, res.data.authToken, model.username, res.data.user);
       router.push("/chats");
     } catch (error) {
       console.log(error);
       if (error.response) {
-        message.error(error.response.data.message, 2);
+        messages('error', error.response.data.message, 2);
         error.response.data.errors.forEach((item) => {
           fieldErrors[item.field] = item.message;
         });

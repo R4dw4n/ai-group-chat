@@ -52,6 +52,7 @@ const AvatarUpload = ({
   setFileList,
   setPreviewImage,
   setPreviewOpen,
+  setIsRemoved,
 }) => {
   const { t } = useTranslation();
   const handlePreview = (file) =>
@@ -78,6 +79,9 @@ const AvatarUpload = ({
         fileList={fileList}
         onPreview={handlePreview}
         onChange={handleChange}
+        onRemove={() => {
+          if(setIsRemoved) setIsRemoved(true);
+        }}
       >
         {fileList.length > 0 ? null : uploadButton}
       </Upload>

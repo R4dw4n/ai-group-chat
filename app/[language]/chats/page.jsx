@@ -66,16 +66,6 @@ function Page() {
     const subscription = chatService.subscribeToRoom(group.id).subscribe({
       next: (message) => {
         setReceivedMessage({ ...message });
-
-        // Reorder groups to put the group that received the message first
-        setGroups((prevGroups) => {
-          const groupIndex = prevGroups.findIndex((g) => g.id === group.id);
-          if (groupIndex === -1) return prevGroups;
-          let updatedGroups = [...prevGroups];
-          const [movedGroup] = updatedGroups.splice(groupIndex, 1);
-          updatedGroups = [movedGroup, ...updatedGroups];
-          return updatedGroups;
-        });
       },
       error: (err) => console.error("Subscription error:", err),
     });

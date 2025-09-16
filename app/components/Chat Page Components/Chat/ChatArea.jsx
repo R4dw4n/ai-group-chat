@@ -62,6 +62,10 @@ function ChatArea({
       if (groupIndex === -1) return prevGroups;
       let updatedGroups = [...prevGroups];
       updatedGroups[groupIndex].lastMessage = {...newMessage, message: message.trim()};
+
+      // Reorder groups to put the group that sent the message first
+      const [movedGroup] = updatedGroups.splice(groupIndex, 1);
+      updatedGroups = [movedGroup, ...updatedGroups];
       return updatedGroups;
     });
     chatService.sendMessage(chatId, message.trim());
@@ -97,7 +101,7 @@ function ChatArea({
       const newMessage = {
         from: 0,
         time: new Date(),
-        content: ``,
+        content: `Image File`,
         user: {
           name: getUser()?.name,
         },
@@ -114,30 +118,17 @@ function ChatArea({
       };
       setMessages((prev) => [
         ...prev,
-        {
-          from: 0,
-          time: new Date(),
-          content: `Image File`,
-          user: {
-            name: getUser()?.name,
-          },
-          type: "image",
-          attachments: [
-            {
-              name: file.name,
-              size: file.size,
-              type: file.type,
-              url: URL.createObjectURL(file),
-              image_url: URL.createObjectURL(file),
-            },
-          ],
-        },
+        newMessage,
       ]);
       setGroups((prevGroups) => {
         const groupIndex = prevGroups.findIndex((g) => g.id === chatId);
         if (groupIndex === -1) return prevGroups;
         let updatedGroups = [...prevGroups];
         updatedGroups[groupIndex].lastMessage = {...newMessage, message: "Image File"};
+
+        // Reorder groups to put the group that sent the message first
+        const [movedGroup] = updatedGroups.splice(groupIndex, 1);
+        updatedGroups = [movedGroup, ...updatedGroups];
         return updatedGroups;
       });
       await chatService.sendImage(chatId, file);
@@ -297,6 +288,7 @@ function ChatArea({
       receivedMessage.rid === chatId &&
       chatContainerRef.current
     ) {
+      console.log('received', receivedMessage)
       const container = chatContainerRef.current;
       const previousScrollHeight = container.scrollHeight,
         previousScrollTop = container.scrollTop;
@@ -344,6 +336,10 @@ function ChatArea({
         if (groupIndex === -1) return prevGroups;
         let updatedGroups = [...prevGroups];
         updatedGroups[groupIndex].lastMessage = {...newMessage, message: receivedMessage.msg};
+
+        // Reorder groups to put the group that received the message first
+        const [movedGroup] = updatedGroups.splice(groupIndex, 1);
+        updatedGroups = [movedGroup, ...updatedGroups];
         return updatedGroups;
       });
       setTimeout(() => {

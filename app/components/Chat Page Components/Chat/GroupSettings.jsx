@@ -22,13 +22,13 @@ const GroupSettings = forwardRef(
       group,
       editMode,
       members,
-      setGroup,
       handleFormSubmit,
       setEditMode,
       addMembersOpen,
       setAddMembersOpen,
       fileList,
       setFileList,
+      setIsRemoved,
     },
     ref
   ) => {
@@ -85,6 +85,7 @@ const GroupSettings = forwardRef(
             setPreviewImage={setPreviewImage}
             previewOpen={previewOpen}
             setPreviewOpen={setPreviewOpen}
+            setIsRemoved={setIsRemoved}
           />
           <Form.Item
             name="name"
@@ -148,16 +149,16 @@ const GroupSettings = forwardRef(
             {members.map((member, ind) => (
               <div key={ind} className="flex items-center gap-3 mb-5">
                 <div className="overflow-hidden flex rounded-full w-12 h-12">
-                  {member?.avatarUrl && member?.avatarUrl.includes("etag") && (
+                  {member?.avatarUrl && (
                     <Image
                       alt="profile-pic"
                       src={member?.avatarUrl}
                       width={48}
                       height={48}
+                      unoptimized={!member?.avatarUrl.includes("etag")}
                     />
                   )}
-                  {(!member?.avatarUrl ||
-                    !member?.avatarUrl.includes("etag")) && (
+                  {!member?.avatarUrl && (
                     <Image
                       alt="profile-pic"
                       src={images.PROFILE}
